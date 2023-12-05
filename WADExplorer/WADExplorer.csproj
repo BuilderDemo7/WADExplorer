@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>programicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -103,6 +106,7 @@
     <Content Include="Images\playbtn.png" />
     <Content Include="Images\text.png" />
     <Content Include="Images\vehicle.png" />
+    <Content Include="programicon.ico" />
     <None Include="Images\stopbtn_small.png" />
     <None Include="Images\playbtn_small.png" />
     <Content Include="Images\root.png" />
