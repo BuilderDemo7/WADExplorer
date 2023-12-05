@@ -562,7 +562,7 @@ namespace WADExplorer
 
         private void dontSortToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DontSort = true;
+            DontSort = dontSortToolStripMenuItem.Checked;
             GenerateList();
         }
 
