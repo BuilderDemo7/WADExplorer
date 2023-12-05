@@ -82,8 +82,26 @@ namespace WADExplorer
             AddButton.Enabled = true;
             NewFolderButton.Enabled = true;
 
+            addFileToolStripMenuItem.Enabled = true;
+            ToolStripAddFileButton.Enabled = true;
+            deleteToolStripMenuItem.Enabled = true;
+            ToolStripDeleteButton.Enabled = true;
+            newFolderToolStripMenuItem.Enabled = true;
+            ToolStripNewFolderButton.Enabled = true;
+            replaceWithToolStripMenuItem.Enabled = true;
+            ToolStripReplaceButton.Enabled = true;
+            extractToToolStripMenuItem.Enabled = true;
+            ToolStripExtractButton.Enabled = true;
+
             FileTree.Enabled = true;
             this.Text = this.Tag + " - " + OpenPackage.FileName;
+
+            UpdateTools();
+        }
+
+        public void UpdateTools()
+        {
+            StatusLabel.Text = String.Format("{0} Files loaded", OpenPackage.Items.Count);
         }
 
         public void ExtractItemChildrenTo(InsideItem item, string path, bool chain = false, string associatedPath = "")
@@ -134,12 +152,15 @@ namespace WADExplorer
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Error loading image!\n\n{ex.Message}\n- {ex.Source}\n\nBitmap corrupted or unsupported", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        PreviewUnavailableLabel.Visible = true;
                         return;
                     }
                 }
                 audioPlayer.Visible = false;
                 TextPreview.Visible = false;
                 AnyLabel.Visible = false;
+                PreviewUnavailableLabel.Visible = false;
+
                 PreviewPictureBox.Visible = true;
                 PicturePanel.Visible = true;
 
@@ -148,7 +169,7 @@ namespace WADExplorer
 
                 PicturePanel.HorizontalScroll.Value = 0;
                 PicturePanel.VerticalScroll.Value = 0;
-
+                
                 PicturePanel.AutoScroll = false;
                 PicturePanel.VerticalScroll.Enabled = true;
                 PicturePanel.VerticalScroll.Visible = true;
@@ -161,6 +182,8 @@ namespace WADExplorer
             }
             else if (item.Name.ToLower().Contains(".wav") | item.Name.ToLower().Contains(".ogg") | item.Name.ToLower().Contains(".mp3"))
             {
+                PreviewUnavailableLabel.Visible = false;
+
                 PreviewPictureBox.Visible = false;
                 PicturePanel.Visible = false;
 
@@ -173,8 +196,10 @@ namespace WADExplorer
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error loading sound!\n\n{ex.Message}\n- {ex.Source}\n\nSound corrupted or unsupported", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    PreviewUnavailableLabel.Visible = true;
                     return;
                 }
+                PreviewUnavailableLabel.Visible = false;
                 audioPlayer.AudioDescription.Text = item.Name;
                 audioPlayer.Visible = true;
                 TextPreview.Visible = false;
@@ -183,6 +208,8 @@ namespace WADExplorer
             // special sound format
             else if (item.Name.ToLower().Contains(".vag"))
             {
+                PreviewUnavailableLabel.Visible = false;
+
                 PreviewPictureBox.Visible = false;
                 PicturePanel.Visible = false;
 
@@ -203,6 +230,8 @@ namespace WADExplorer
             }
             else if (item.Name.ToLower().Contains(".txt") | item.Name.ToLower().Contains(".cfg") | item.Name.ToLower().Contains(".dir"))
             {
+                PreviewUnavailableLabel.Visible = false;
+
                 PreviewPictureBox.Visible = false;
                 PicturePanel.Visible = true; // necessary
                 audioPlayer.Visible = false;
@@ -220,6 +249,8 @@ namespace WADExplorer
             }
             else if (item.IsFolder)
             {
+                PreviewUnavailableLabel.Visible = false;
+
                 PreviewPictureBox.Visible = false;
                 PicturePanel.Visible = true; // necessary
                 audioPlayer.Visible = false;
@@ -232,10 +263,13 @@ namespace WADExplorer
             else
             {
                 PreviewPictureBox.Visible = false;
-                PicturePanel.Visible = false;
+                PicturePanel.Visible = true;
                 audioPlayer.Visible = false;
                 TextPreview.Visible = false;
                 AnyLabel.Visible = false;
+
+                PreviewUnavailableLabel.Visible = true;
+                PreviewUnavailableLabel.Update();
             }
         }
 
@@ -249,6 +283,7 @@ namespace WADExplorer
                 else
                     CreateItemsUnSorted();
             }
+            UpdateTools();
         }
 
         public void SetIconForNode(TreeNode node)

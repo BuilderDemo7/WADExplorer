@@ -66,6 +66,18 @@
             this.FilePG = new System.Windows.Forms.PropertyGrid();
             this.PreviewUnavailableLabel = new System.Windows.Forms.Label();
             this.ShowMoreInfoBTN = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.ToolStripNewFolderButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.ToolStripAddFileButton = new System.Windows.Forms.ToolStripButton();
+            this.ToolStripDeleteButton = new System.Windows.Forms.ToolStripButton();
+            this.ToolStripReplaceButton = new System.Windows.Forms.ToolStripButton();
+            this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -74,11 +86,14 @@
             this.EditContextMenu.SuspendLayout();
             this.PicturePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PreviewPictureBox)).BeginInit();
+            this.statusStrip1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
             // 
-            this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.menuStrip1.BackColor = System.Drawing.SystemColors.Control;
+            this.menuStrip1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
@@ -147,6 +162,9 @@
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.extractToToolStripMenuItem,
             this.replaceWithToolStripMenuItem,
+            this.deleteToolStripMenuItem,
+            this.addFileToolStripMenuItem,
+            this.newFolderToolStripMenuItem,
             this.toolStripSeparator2,
             this.dontSortToolStripMenuItem,
             this.ShowMoreInfoBTN,
@@ -157,6 +175,7 @@
             // 
             // extractToToolStripMenuItem
             // 
+            this.extractToToolStripMenuItem.Enabled = false;
             this.extractToToolStripMenuItem.Name = "extractToToolStripMenuItem";
             this.extractToToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.extractToToolStripMenuItem.Text = "Extract To";
@@ -164,6 +183,7 @@
             // 
             // replaceWithToolStripMenuItem
             // 
+            this.replaceWithToolStripMenuItem.Enabled = false;
             this.replaceWithToolStripMenuItem.Name = "replaceWithToolStripMenuItem";
             this.replaceWithToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.replaceWithToolStripMenuItem.Text = "Replace With";
@@ -228,7 +248,7 @@
             this.SplitPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.SplitPanel.Location = new System.Drawing.Point(0, 27);
+            this.SplitPanel.Location = new System.Drawing.Point(0, 52);
             this.SplitPanel.Name = "SplitPanel";
             // 
             // SplitPanel.Panel1
@@ -244,7 +264,7 @@
             this.SplitPanel.Panel2.Controls.Add(this.ReplaceButton);
             this.SplitPanel.Panel2.Controls.Add(this.ExtractButton);
             this.SplitPanel.Panel2.Controls.Add(this.FilePG);
-            this.SplitPanel.Size = new System.Drawing.Size(1108, 714);
+            this.SplitPanel.Size = new System.Drawing.Size(1108, 664);
             this.SplitPanel.SplitterDistance = 690;
             this.SplitPanel.TabIndex = 2;
             // 
@@ -261,7 +281,7 @@
             this.FileTree.Location = new System.Drawing.Point(0, 0);
             this.FileTree.Name = "FileTree";
             this.FileTree.SelectedImageIndex = 0;
-            this.FileTree.Size = new System.Drawing.Size(688, 714);
+            this.FileTree.Size = new System.Drawing.Size(688, 664);
             this.FileTree.TabIndex = 0;
             this.FileTree.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterCollapse);
             this.FileTree.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterExpand);
@@ -308,7 +328,7 @@
             this.NewFolderButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.NewFolderButton.Enabled = false;
-            this.NewFolderButton.Location = new System.Drawing.Point(0, 442);
+            this.NewFolderButton.Location = new System.Drawing.Point(0, 392);
             this.NewFolderButton.Name = "NewFolderButton";
             this.NewFolderButton.Size = new System.Drawing.Size(414, 23);
             this.NewFolderButton.TabIndex = 7;
@@ -321,7 +341,7 @@
             this.AddButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddButton.Enabled = false;
-            this.AddButton.Location = new System.Drawing.Point(0, 420);
+            this.AddButton.Location = new System.Drawing.Point(0, 370);
             this.AddButton.Name = "AddButton";
             this.AddButton.Size = new System.Drawing.Size(414, 23);
             this.AddButton.TabIndex = 6;
@@ -334,7 +354,7 @@
             this.DeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DeleteButton.Enabled = false;
-            this.DeleteButton.Location = new System.Drawing.Point(0, 398);
+            this.DeleteButton.Location = new System.Drawing.Point(0, 348);
             this.DeleteButton.Name = "DeleteButton";
             this.DeleteButton.Size = new System.Drawing.Size(414, 23);
             this.DeleteButton.TabIndex = 5;
@@ -350,7 +370,7 @@
             this.PicturePanel.Controls.Add(this.AnyLabel);
             this.PicturePanel.Controls.Add(this.TextPreview);
             this.PicturePanel.Controls.Add(this.PreviewPictureBox);
-            this.PicturePanel.Location = new System.Drawing.Point(0, 468);
+            this.PicturePanel.Location = new System.Drawing.Point(0, 418);
             this.PicturePanel.Name = "PicturePanel";
             this.PicturePanel.Size = new System.Drawing.Size(414, 246);
             this.PicturePanel.TabIndex = 4;
@@ -392,7 +412,7 @@
             this.ReplaceButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ReplaceButton.Enabled = false;
-            this.ReplaceButton.Location = new System.Drawing.Point(0, 376);
+            this.ReplaceButton.Location = new System.Drawing.Point(0, 326);
             this.ReplaceButton.Name = "ReplaceButton";
             this.ReplaceButton.Size = new System.Drawing.Size(414, 23);
             this.ReplaceButton.TabIndex = 2;
@@ -405,7 +425,7 @@
             this.ExtractButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ExtractButton.Enabled = false;
-            this.ExtractButton.Location = new System.Drawing.Point(0, 354);
+            this.ExtractButton.Location = new System.Drawing.Point(0, 304);
             this.ExtractButton.Name = "ExtractButton";
             this.ExtractButton.Size = new System.Drawing.Size(414, 23);
             this.ExtractButton.TabIndex = 1;
@@ -421,7 +441,7 @@
             this.FilePG.Enabled = false;
             this.FilePG.Location = new System.Drawing.Point(0, 0);
             this.FilePG.Name = "FilePG";
-            this.FilePG.Size = new System.Drawing.Size(414, 354);
+            this.FilePG.Size = new System.Drawing.Size(414, 304);
             this.FilePG.TabIndex = 0;
             this.FilePG.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.FilePG_PropertyValueChanged);
             // 
@@ -431,12 +451,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PreviewUnavailableLabel.AutoSize = true;
             this.PreviewUnavailableLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PreviewUnavailableLabel.Location = new System.Drawing.Point(80, 109);
+            this.PreviewUnavailableLabel.Location = new System.Drawing.Point(91, 111);
             this.PreviewUnavailableLabel.Name = "PreviewUnavailableLabel";
             this.PreviewUnavailableLabel.Size = new System.Drawing.Size(246, 20);
             this.PreviewUnavailableLabel.TabIndex = 5;
             this.PreviewUnavailableLabel.Text = "No preview available for this file";
-            this.PreviewUnavailableLabel.Visible = false;
             // 
             // ShowMoreInfoBTN
             // 
@@ -446,13 +465,137 @@
             this.ShowMoreInfoBTN.Text = "Show More Info";
             this.ShowMoreInfoBTN.Click += new System.EventHandler(this.showMoreInfoToolStripMenuItem_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 719);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1108, 22);
+            this.statusStrip1.TabIndex = 3;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // StatusLabel
+            // 
+            this.StatusLabel.Name = "StatusLabel";
+            this.StatusLabel.Size = new System.Drawing.Size(122, 17);
+            this.StatusLabel.Text = "No archive file loaded";
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.BackColor = System.Drawing.SystemColors.Control;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripNewFolderButton,
+            this.toolStripSeparator3,
+            this.ToolStripAddFileButton,
+            this.ToolStripDeleteButton,
+            this.ToolStripReplaceButton,
+            this.ToolStripExtractButton});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(1108, 25);
+            this.toolStrip1.TabIndex = 4;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // ToolStripNewFolderButton
+            // 
+            this.ToolStripNewFolderButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripNewFolderButton.Enabled = false;
+            this.ToolStripNewFolderButton.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripNewFolderButton.Image")));
+            this.ToolStripNewFolderButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripNewFolderButton.Name = "ToolStripNewFolderButton";
+            this.ToolStripNewFolderButton.Size = new System.Drawing.Size(23, 22);
+            this.ToolStripNewFolderButton.Text = "toolStripButton1";
+            this.ToolStripNewFolderButton.ToolTipText = "New Folder";
+            this.ToolStripNewFolderButton.Click += new System.EventHandler(this.NewFolderButton_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            // 
+            // ToolStripAddFileButton
+            // 
+            this.ToolStripAddFileButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripAddFileButton.Enabled = false;
+            this.ToolStripAddFileButton.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripAddFileButton.Image")));
+            this.ToolStripAddFileButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripAddFileButton.Name = "ToolStripAddFileButton";
+            this.ToolStripAddFileButton.Size = new System.Drawing.Size(23, 22);
+            this.ToolStripAddFileButton.Text = "toolStripButton2";
+            this.ToolStripAddFileButton.ToolTipText = "Add New File";
+            this.ToolStripAddFileButton.Click += new System.EventHandler(this.AddButton_Click);
+            // 
+            // ToolStripDeleteButton
+            // 
+            this.ToolStripDeleteButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripDeleteButton.Enabled = false;
+            this.ToolStripDeleteButton.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripDeleteButton.Image")));
+            this.ToolStripDeleteButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripDeleteButton.Name = "ToolStripDeleteButton";
+            this.ToolStripDeleteButton.Size = new System.Drawing.Size(23, 22);
+            this.ToolStripDeleteButton.Text = "toolStripButton3";
+            this.ToolStripDeleteButton.ToolTipText = "Delete";
+            this.ToolStripDeleteButton.Click += new System.EventHandler(this.DeleteButton_Click);
+            // 
+            // ToolStripReplaceButton
+            // 
+            this.ToolStripReplaceButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripReplaceButton.Enabled = false;
+            this.ToolStripReplaceButton.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripReplaceButton.Image")));
+            this.ToolStripReplaceButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripReplaceButton.Name = "ToolStripReplaceButton";
+            this.ToolStripReplaceButton.Size = new System.Drawing.Size(23, 22);
+            this.ToolStripReplaceButton.Text = "toolStripButton4";
+            this.ToolStripReplaceButton.ToolTipText = "Replace With";
+            this.ToolStripReplaceButton.Click += new System.EventHandler(this.ReplaceButton_Click);
+            // 
+            // addFileToolStripMenuItem
+            // 
+            this.addFileToolStripMenuItem.Enabled = false;
+            this.addFileToolStripMenuItem.Name = "addFileToolStripMenuItem";
+            this.addFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addFileToolStripMenuItem.Text = "Add File";
+            this.addFileToolStripMenuItem.Click += new System.EventHandler(this.AddButton_Click);
+            // 
+            // newFolderToolStripMenuItem
+            // 
+            this.newFolderToolStripMenuItem.Enabled = false;
+            this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
+            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newFolderToolStripMenuItem.Text = "New Folder";
+            this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.NewFolderButton_Click);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Enabled = false;
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteButton_Click);
+            // 
+            // ToolStripExtractButton
+            // 
+            this.ToolStripExtractButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolStripExtractButton.Enabled = false;
+            this.ToolStripExtractButton.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripExtractButton.Image")));
+            this.ToolStripExtractButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripExtractButton.Name = "ToolStripExtractButton";
+            this.ToolStripExtractButton.Size = new System.Drawing.Size(23, 22);
+            this.ToolStripExtractButton.Text = "toolStripButton1";
+            this.ToolStripExtractButton.ToolTipText = "Extract To";
+            this.ToolStripExtractButton.Click += new System.EventHandler(this.ExtractButton_Click);
+            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1108, 741);
+            this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.SplitPanel);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Window";
             this.Tag = "WAD Explorer";
@@ -467,6 +610,10 @@
             this.PicturePanel.ResumeLayout(false);
             this.PicturePanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PreviewPictureBox)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -510,6 +657,18 @@
         public System.Windows.Forms.ToolStripMenuItem NewFormatButton;
         private System.Windows.Forms.Label PreviewUnavailableLabel;
         private System.Windows.Forms.ToolStripMenuItem ShowMoreInfoBTN;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton ToolStripNewFolderButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton ToolStripAddFileButton;
+        private System.Windows.Forms.ToolStripButton ToolStripDeleteButton;
+        private System.Windows.Forms.ToolStripButton ToolStripReplaceButton;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newFolderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton ToolStripExtractButton;
     }
 }
 
