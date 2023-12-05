@@ -67,6 +67,11 @@ namespace WADExplorer
         bool saveInNewFormat = true;
         int SelectedIndex = -1;
         bool DontSort = false;
+        bool showMoreInfo = false;
+#if DEBUG
+        showMoreInfo = true;
+        ShowMoreInfoBTN.Checked = true;
+#endif
 
         public void InitTools()
         {
@@ -196,12 +201,17 @@ namespace WADExplorer
                 TextPreview.Visible = false;
                 AnyLabel.Visible = false;
             }
-            else if (item.Name.ToLower().Contains(".txt") | item.Name.ToLower().Contains(".dir"))
+            else if (item.Name.ToLower().Contains(".txt") | item.Name.ToLower().Contains(".cfg") | item.Name.ToLower().Contains(".dir"))
             {
                 PreviewPictureBox.Visible = false;
                 PicturePanel.Visible = true; // necessary
                 audioPlayer.Visible = false;
                 PicturePanel.AutoScroll = true;
+                PicturePanel.VerticalScroll.Enabled = false;
+                PicturePanel.VerticalScroll.Visible = false;
+                PicturePanel.HorizontalScroll.Enabled = false;
+                PicturePanel.HorizontalScroll.Visible = false;
+
 
                 TextPreview.Text = Encoding.Default.GetString(item.Buffer);
                 TextPreview.ReadOnly = true;
@@ -266,16 +276,20 @@ namespace WADExplorer
 
         public string GetItemDisplayName(InsideItem item)
         {
-#if DEBUG
-            if (item.Index != 0)
-                return $"[{item.Index}] {item.Name} (0x{item.CRC:X8})";
+            if (showMoreInfo)
+            {
+                if (item.Index != 0)
+                    return $"[{item.Index}] {item.Name} (0x{item.CRC:X8})";
+                else
+                    return $"[{item.Index}] (Root) (0x{item.CRC:X8})";
+            }
             else
-                return $"[{item.Index}] (Root) (0x{item.CRC:X8})";
-#endif
-            if (item.Index != 0)
-                return $"{item.Name}";
-            else
-                return $"(Root)";
+            {
+                if (item.Index != 0)
+                    return $"{item.Name}";
+                else
+                    return $"(Root)";
+            }
         }
 
         public void CreateItems(InsideItem item, bool createNewNode = true, TreeNodeCollection collection = null)
@@ -388,7 +402,7 @@ namespace WADExplorer
 
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("SOFTWARE UNDER MIT LICENSE\nYOU MAY REDISTRIBUTE THIS SOFTWARE FREELY\n\nAuthor: BuilderDemo7\nGitHub: @BuilderDemo7\n\nPurpose:\nOpen .WAD files from RenderWare", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
+            MessageBox.Show("SOFTWARE UNDER MIT LICENSE\nCOPYRIGHT 2023 (C) BUILDERDEMO7\n\nAuthor: BuilderDemo7\nGitHub: @BuilderDemo7\n\nPurpose:\nOpen .WAD files from RenderWare", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
         private void ExtractButton_Click(object sender, EventArgs e)
@@ -634,7 +648,7 @@ namespace WADExplorer
         {
             if (FilePG.SelectedObject == null)
             {
-                MessageBox.Show("Please select a item to add your new folder into", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Please select a folder to add your new folder into", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             else if (FilePG.SelectedObject != null)
@@ -664,6 +678,7 @@ namespace WADExplorer
             GenerateList();
         }
 
+        // not working :(
         private void FilePG_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             if (e.ChangedItem!=null & e.ChangedItem.Label=="Name")
@@ -685,6 +700,12 @@ namespace WADExplorer
             }
         }
 
+        public void updateOldNewFMTButtons()
+        {
+            NewFormatButton.Checked = saveInNewFormat;
+            OldFormatButton.Checked = !saveInNewFormat;
+        }
+
         private void NewFormatButton_Click(object sender, EventArgs e)
         {
             saveInNewFormat = true;
@@ -699,6 +720,12 @@ namespace WADExplorer
             ToolStripMenuItem button = sender as ToolStripMenuItem;
             button.Checked = true;
             NewFormatButton.Checked = false;
+        }
+
+        private void showMoreInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            showMoreInfo = ShowMoreInfoBTN.Checked;
+            GenerateList();
         }
     }
 }

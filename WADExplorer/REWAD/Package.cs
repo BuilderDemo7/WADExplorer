@@ -175,6 +175,10 @@ namespace WADExplorer
                 }
             }
         }
+        public static int GetNextLineOf(int from)
+        {
+            return 16 * ((from / 16) + 1);
+        }
         public virtual void Load(Stream s)
         {
             if (s!=null)
