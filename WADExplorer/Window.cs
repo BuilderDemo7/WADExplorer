@@ -18,7 +18,10 @@ namespace WADExplorer
         public Window()
         {
             InitializeComponent();
-
+#if DEBUG
+            showMoreInfo = true;
+            ShowMoreInfoBTN.Checked = true;
+#endif
 
             audioPlayer.Visible = false;
             audioPlayer.Location = this.PicturePanel.Location;
@@ -68,10 +71,6 @@ namespace WADExplorer
         int SelectedIndex = -1;
         bool DontSort = false;
         bool showMoreInfo = false;
-#if DEBUG
-        showMoreInfo = true;
-        ShowMoreInfoBTN.Checked = true;
-#endif
 
         public void InitTools()
         {
