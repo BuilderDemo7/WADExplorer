@@ -2,9 +2,9 @@
 DDI Games .WAD archive files explorer, it can open .WAD files for Monster Trux: Extreme, Rig Racer 2, Offroad Extreme!, Ninja Breadman, etc.                        
 Choose between two formats: old and new, because DDI has changed the .WAD files format between the developed games.
 # License
-MIT License                             
+*MIT License*                            
 
-Copyright (c) 2023 BuilderDemo7                          
+**Copyright (c) 2023 BuilderDemo7**                                                           
 
 Permission is hereby granted, free of charge, to any person obtaining a copy                     
 of this software and associated documentation files (the "Software"), to deal                         
