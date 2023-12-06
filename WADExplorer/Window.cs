@@ -72,6 +72,8 @@ namespace WADExplorer
         bool DontSort = false;
         bool showMoreInfo = false;
 
+        public List<InsideItem> CheckedItems = new List<InsideItem>();
+
         public void InitTools()
         {
             FilePG.Enabled = true;
@@ -91,6 +93,8 @@ namespace WADExplorer
             ToolStripReplaceButton.Enabled = true;
             extractToToolStripMenuItem.Enabled = true;
             ToolStripExtractButton.Enabled = true;
+
+            SaveBTNTS.Enabled = true;
 
             FileTree.Enabled = true;
             this.Text = this.Tag + " - " + OpenPackage.FileName;
@@ -386,7 +390,7 @@ namespace WADExplorer
         {
             OpenFileDialog fileDialog = new OpenFileDialog() {
                 Filter = "RenderWare Package Files|*.wad",
-                Title = "Open RenderWare Package File"
+                Title = "Open RenderWare Package File "+ (loadedOldFormat ? "(Old Format)" : "(New Format)")
             };
 
 
@@ -403,13 +407,23 @@ namespace WADExplorer
                     short vertest = f.ReadInt16();
                     if (vertest == -1 & loadedOldFormat)
                     {
-                        if (MessageBox.Show("The WAD file seems to be in new format\nDo you still want to open it anyways?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
-                            return;
+                        if (MessageBox.Show("The WAD file seems to be in new format\nDo you want to open it in the new format?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        {
+                            loadedOldFormat = false;
+                            saveInNewFormat = true;
+                            updateOldNewFMTButtons();
+                            updateOldNewFMTButtons2();
+                        }
                     }
                     if (vertest == 255 & !loadedOldFormat)
                     {
-                        if (MessageBox.Show("The WAD file seems to be in old format\nDo you still want to open it anyways?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
-                            return;
+                        if (MessageBox.Show("The WAD file seems to be in old format\nDo you want to open it in the old format?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        {
+                            loadedOldFormat = true;
+                            saveInNewFormat = false;
+                            updateOldNewFMTButtons();
+                            updateOldNewFMTButtons2();
+                        }
                     }
                 }
 
@@ -426,11 +440,19 @@ namespace WADExplorer
         public void OpenNew(object sender, EventArgs e)
         {
             loadedOldFormat = false;
+            saveInNewFormat = true;
+            updateOldNewFMTButtons();
+            updateOldNewFMTButtons2();
+
             openToolStripMenuItem_Click(sender, e);
         }
         public void OpenOld(object sender, EventArgs e)
         {
             loadedOldFormat = true;
+            saveInNewFormat = false;
+            updateOldNewFMTButtons();
+            updateOldNewFMTButtons2();
+
             openToolStripMenuItem_Click(sender, e);
         }
 
@@ -441,6 +463,45 @@ namespace WADExplorer
 
         private void ExtractButton_Click(object sender, EventArgs e)
         {
+            if (CheckedItems.Count==0 && FilePG.SelectedObject == null)
+            {
+                MessageBox.Show("There are no specified items", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            else if (CheckedItems.Count>1)
+            {
+                FolderBrowserDialog folder = new FolderBrowserDialog()
+                {
+                    Description = "Choose a folder to extract the checked files"
+                };
+                if (folder.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (InsideItem item in CheckedItems)
+                    {
+                        string itemPath = folder.SelectedPath + @"\" + item.Name;
+                        if (item.IsFolder)
+                            ExtractItemChildrenTo(item, itemPath, true);
+                        else
+                        {
+                            if (File.Exists(itemPath))
+                            {
+                                if (MessageBox.Show(String.Format("The file {0} already exists\nOverwrite?", itemPath), "Overwrite?", MessageBoxButtons.YesNo, MessageBoxIcon.Information)==DialogResult.No)
+                                {
+                                    continue;
+                                }
+                            }
+                            byte[] buffer = OpenPackage.GetItemBuffer(item.Index);
+
+                                FileStream file = new FileStream(itemPath, FileMode.OpenOrCreate, FileAccess.Write);
+                                file.Write(buffer, 0, buffer.Length);
+                                file.Close();
+                        }
+
+                    }
+                }
+                MessageBox.Show(String.Format("Successfully extracted items to folder '{0}'!", folder.SelectedPath), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             if (FilePG.SelectedObject != null)
             {
                 InsideItem item = (InsideItem)FilePG.SelectedObject;
@@ -453,12 +514,12 @@ namespace WADExplorer
                 {
                     FolderBrowserDialog folder = new FolderBrowserDialog()
                     {
-                        Description = "Choose a folder to extract the files of the folder"
+                        Description = "Choose a folder to extract the selected folder"
                     };
                     if (folder.ShowDialog() == DialogResult.OK)
                     {
-                        ExtractItemChildrenTo(item, folder.SelectedPath, true);
-                        MessageBox.Show(String.Format("Successfully extracted files to folder '{0}'!", folder.SelectedPath), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        ExtractItemChildrenTo(item, folder.SelectedPath+"/"+item.Name, true);
+                        MessageBox.Show(String.Format("Successfully extracted folder to '{0}'!", folder.SelectedPath), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
                     else
@@ -470,7 +531,8 @@ namespace WADExplorer
                 SaveFileDialog saveFile = new SaveFileDialog()
                 {
                     FileName = fileName,
-                    Filter = "Any file|*.*"
+                    Filter = "Any file|*.*",
+                    Title = "Extract file to.."
                 };
 
                 if (saveFile.ShowDialog() == DialogResult.OK)
@@ -484,8 +546,8 @@ namespace WADExplorer
                     MessageBox.Show(String.Format("Successfully extracted to '{0}'!", saveFile.FileName), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            else
-                MessageBox.Show("No item to extract!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //else
+            //    MessageBox.Show("No item to extract!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -493,7 +555,7 @@ namespace WADExplorer
             SaveFileDialog saveFile = new SaveFileDialog()
             {
                 Filter = "RenderWare Package File|*.wad",
-                Title = "Save As"
+                Title = "Save RenderWare Package File As " + (saveInNewFormat ? "(Old Format)" : "(New Format)")
             };
 
             if (saveFile.ShowDialog() == DialogResult.OK)
@@ -550,6 +612,9 @@ namespace WADExplorer
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (MessageBox.Show("This will overwrite the old file WITH NO BACKUPS, continue?", "Continue?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                return;
+
             byte[] buffer = OpenPackage.RegenerateAndReturnBuffer(saveInNewFormat);
 
             OpenPackage.Dispose(); // dispose old stream
@@ -675,7 +740,6 @@ namespace WADExplorer
                 // update the list
                 GenerateList();
             }
-
         }
 
         private void NewFolderButton_Click(object sender, EventArgs e)
@@ -740,26 +804,49 @@ namespace WADExplorer
             OldFormatButton.Checked = !saveInNewFormat;
         }
 
+        public void updateOldNewFMTButtons2()
+        {
+            oldFormatToolStripMenuItem1.Checked = loadedOldFormat;
+            newFormatToolStripMenuItem1.Checked = !loadedOldFormat; 
+        }
+
         private void NewFormatButton_Click(object sender, EventArgs e)
         {
             saveInNewFormat = true;
-            ToolStripMenuItem button = sender as ToolStripMenuItem;
-            button.Checked = false;
-            OldFormatButton.Checked = false;
+            updateOldNewFMTButtons();
         }
 
         private void oldToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveInNewFormat = false;
-            ToolStripMenuItem button = sender as ToolStripMenuItem;
-            button.Checked = true;
-            NewFormatButton.Checked = false;
+            updateOldNewFMTButtons();
         }
 
         private void showMoreInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showMoreInfo = ShowMoreInfoBTN.Checked;
             GenerateList();
+        }
+
+        private void FileTree_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            InsideItem item = e.Node.Tag as InsideItem;
+            if (e.Node.Checked)
+                CheckedItems.Add(item);
+            else
+                CheckedItems.Remove(item);
+        }
+
+        private void newFormatToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            loadedOldFormat = false;
+            updateOldNewFMTButtons2();
+        }
+
+        private void oldFormatToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            loadedOldFormat = true;
+            updateOldNewFMTButtons2();
         }
     }
 }

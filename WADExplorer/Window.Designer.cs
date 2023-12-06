@@ -78,6 +78,16 @@
             this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
+            this.oldFormatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.newFormatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.SaveBTNTS = new System.Windows.Forms.ToolStripSplitButton();
+            this.oldFormatToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.newFormatToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripTextBox2 = new System.Windows.Forms.ToolStripTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -113,7 +123,7 @@
             this.saveAsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            this.fileToolStripMenuItem.Text = "&File";
             // 
             // openToolStripMenuItem
             // 
@@ -121,8 +131,8 @@
             this.newFormatToolStripMenuItem,
             this.oldFormatToolStripMenuItem});
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.openToolStripMenuItem.Text = "Open";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Text = "&Open";
             // 
             // newFormatToolStripMenuItem
             // 
@@ -141,20 +151,20 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(111, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
-            this.saveAsToolStripMenuItem.Text = "Save As";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Text = "&Save As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
@@ -171,14 +181,14 @@
             this.saveFormatToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem.Text = "Edit";
+            this.editToolStripMenuItem.Text = "&Edit";
             // 
             // extractToToolStripMenuItem
             // 
             this.extractToToolStripMenuItem.Enabled = false;
             this.extractToToolStripMenuItem.Name = "extractToToolStripMenuItem";
             this.extractToToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.extractToToolStripMenuItem.Text = "Extract To";
+            this.extractToToolStripMenuItem.Text = "Extract";
             this.extractToToolStripMenuItem.Click += new System.EventHandler(this.ExtractButton_Click);
             // 
             // replaceWithToolStripMenuItem
@@ -214,7 +224,7 @@
             // OldFormatButton
             // 
             this.OldFormatButton.Name = "OldFormatButton";
-            this.OldFormatButton.Size = new System.Drawing.Size(98, 22);
+            this.OldFormatButton.Size = new System.Drawing.Size(180, 22);
             this.OldFormatButton.Text = "Old";
             this.OldFormatButton.Click += new System.EventHandler(this.oldToolStripMenuItem_Click);
             // 
@@ -224,7 +234,7 @@
             this.NewFormatButton.CheckOnClick = true;
             this.NewFormatButton.CheckState = System.Windows.Forms.CheckState.Checked;
             this.NewFormatButton.Name = "NewFormatButton";
-            this.NewFormatButton.Size = new System.Drawing.Size(98, 22);
+            this.NewFormatButton.Size = new System.Drawing.Size(180, 22);
             this.NewFormatButton.Text = "New";
             this.NewFormatButton.Click += new System.EventHandler(this.NewFormatButton_Click);
             // 
@@ -234,12 +244,12 @@
             this.aboutToolStripMenuItem1});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.aboutToolStripMenuItem.Text = "Help";
+            this.aboutToolStripMenuItem.Text = "&Help";
             // 
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem1.Text = "About";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem1_Click);
             // 
@@ -274,6 +284,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FileTree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.FileTree.CheckBoxes = true;
             this.FileTree.ContextMenuStrip = this.EditContextMenu;
             this.FileTree.Enabled = false;
             this.FileTree.ImageIndex = 0;
@@ -283,6 +294,7 @@
             this.FileTree.SelectedImageIndex = 0;
             this.FileTree.Size = new System.Drawing.Size(688, 664);
             this.FileTree.TabIndex = 0;
+            this.FileTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterCheck);
             this.FileTree.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterCollapse);
             this.FileTree.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.FileTree_AfterExpand);
             // 
@@ -429,7 +441,7 @@
             this.ExtractButton.Name = "ExtractButton";
             this.ExtractButton.Size = new System.Drawing.Size(414, 23);
             this.ExtractButton.TabIndex = 1;
-            this.ExtractButton.Text = "Extract To";
+            this.ExtractButton.Text = "Extract";
             this.ExtractButton.UseVisualStyleBackColor = true;
             this.ExtractButton.Click += new System.EventHandler(this.ExtractButton_Click);
             // 
@@ -485,6 +497,10 @@
             // 
             this.toolStrip1.BackColor = System.Drawing.SystemColors.Control;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripButton1,
+            this.SaveBTNTS,
+            this.toolStripSplitButton1,
+            this.toolStripSeparator4,
             this.ToolStripNewFolderButton,
             this.toolStripSeparator3,
             this.ToolStripAddFileButton,
@@ -583,8 +599,103 @@
             this.ToolStripExtractButton.Name = "ToolStripExtractButton";
             this.ToolStripExtractButton.Size = new System.Drawing.Size(23, 22);
             this.ToolStripExtractButton.Text = "toolStripButton1";
-            this.ToolStripExtractButton.ToolTipText = "Extract To";
+            this.ToolStripExtractButton.ToolTipText = "Extract";
             this.ToolStripExtractButton.Click += new System.EventHandler(this.ExtractButton_Click);
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton1.Text = "toolStripButton1";
+            this.toolStripButton1.ToolTipText = "Open";
+            this.toolStripButton1.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // toolStripSplitButton1
+            // 
+            this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSplitButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripTextBox2,
+            this.oldFormatToolStripMenuItem1,
+            this.newFormatToolStripMenuItem1});
+            this.toolStripSplitButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButton1.Image")));
+            this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSplitButton1.Name = "toolStripSplitButton1";
+            this.toolStripSplitButton1.Size = new System.Drawing.Size(32, 22);
+            this.toolStripSplitButton1.Text = "toolStripSplitButton1";
+            this.toolStripSplitButton1.ToolTipText = "Open Format";
+            // 
+            // oldFormatToolStripMenuItem1
+            // 
+            this.oldFormatToolStripMenuItem1.Name = "oldFormatToolStripMenuItem1";
+            this.oldFormatToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.oldFormatToolStripMenuItem1.Text = "Old Format";
+            this.oldFormatToolStripMenuItem1.Click += new System.EventHandler(this.oldFormatToolStripMenuItem1_Click);
+            // 
+            // newFormatToolStripMenuItem1
+            // 
+            this.newFormatToolStripMenuItem1.Checked = true;
+            this.newFormatToolStripMenuItem1.CheckOnClick = true;
+            this.newFormatToolStripMenuItem1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.newFormatToolStripMenuItem1.Name = "newFormatToolStripMenuItem1";
+            this.newFormatToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.newFormatToolStripMenuItem1.Text = "New Format";
+            this.newFormatToolStripMenuItem1.Click += new System.EventHandler(this.newFormatToolStripMenuItem1_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // SaveBTNTS
+            // 
+            this.SaveBTNTS.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.SaveBTNTS.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripTextBox1,
+            this.oldFormatToolStripMenuItem2,
+            this.newFormatToolStripMenuItem2});
+            this.SaveBTNTS.Enabled = false;
+            this.SaveBTNTS.Image = ((System.Drawing.Image)(resources.GetObject("SaveBTNTS.Image")));
+            this.SaveBTNTS.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SaveBTNTS.Name = "SaveBTNTS";
+            this.SaveBTNTS.Size = new System.Drawing.Size(32, 22);
+            this.SaveBTNTS.Text = "toolStripSplitButton2";
+            this.SaveBTNTS.ToolTipText = "Save";
+            this.SaveBTNTS.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // oldFormatToolStripMenuItem2
+            // 
+            this.oldFormatToolStripMenuItem2.Name = "oldFormatToolStripMenuItem2";
+            this.oldFormatToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.oldFormatToolStripMenuItem2.Text = "Old Format";
+            this.oldFormatToolStripMenuItem2.Click += new System.EventHandler(this.oldToolStripMenuItem_Click);
+            // 
+            // newFormatToolStripMenuItem2
+            // 
+            this.newFormatToolStripMenuItem2.Checked = true;
+            this.newFormatToolStripMenuItem2.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.newFormatToolStripMenuItem2.Name = "newFormatToolStripMenuItem2";
+            this.newFormatToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.newFormatToolStripMenuItem2.Text = "New Format";
+            this.newFormatToolStripMenuItem2.Click += new System.EventHandler(this.NewFormatButton_Click);
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.ReadOnly = true;
+            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripTextBox1.Text = "Save Format";
+            // 
+            // toolStripTextBox2
+            // 
+            this.toolStripTextBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.toolStripTextBox2.Name = "toolStripTextBox2";
+            this.toolStripTextBox2.ReadOnly = true;
+            this.toolStripTextBox2.Size = new System.Drawing.Size(100, 16);
+            this.toolStripTextBox2.Text = "Open Format";
             // 
             // Window
             // 
@@ -669,6 +780,16 @@
         private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton ToolStripExtractButton;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripSplitButton toolStripSplitButton1;
+        private System.Windows.Forms.ToolStripMenuItem oldFormatToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem newFormatToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripSplitButton SaveBTNTS;
+        private System.Windows.Forms.ToolStripMenuItem oldFormatToolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem newFormatToolStripMenuItem2;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;
     }
 }
 
