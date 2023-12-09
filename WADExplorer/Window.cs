@@ -10,11 +10,30 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 
+using System.Threading;
+using System.Runtime.InteropServices;
+
 namespace WADExplorer
 {
     public partial class Window : Form
     {
         AudioPlayer audioPlayer = new AudioPlayer();
+        public static bool ConsoleAllocated = false;
+        public bool showErrors = true;
+        //public Thread LoadThread;
+        //private string LoadThread_FileName;
+
+        public void OnFileBufferLoadFail(PackageLoadFileBufferFailureEventArgs e)
+        {
+            if (!showErrors)
+                return;
+
+            if (MessageBox.Show($"The file {e.File.Name} (0x{e.File.CRC:X4}/0x{e.File.Offset:X4}) has failed to load it's buffer\nExpect some errors for now on!\n\nShow more errors?","Warning",MessageBoxButtons.YesNo,MessageBoxIcon.Warning)==DialogResult.No)
+            {
+                showErrors = false;
+            }
+        }
+
         public Window()
         {
             InitializeComponent();
@@ -31,6 +50,11 @@ namespace WADExplorer
             | System.Windows.Forms.AnchorStyles.Right)));
 
             this.SplitPanel.Panel2.Controls.Add(audioPlayer);
+
+            //LoadThread = new Thread(new ThreadStart(delegate
+            //{
+            //    OpenPackage.Load(LoadThread_FileName);
+            //}));
 
             FileTree.AfterSelect += new TreeViewEventHandler(ItemSelected);
             // right clicked or mouse down at
@@ -65,7 +89,8 @@ namespace WADExplorer
             };
         }
 
-        public Package OpenPackage;
+        public Package OpenPackage = new Package();
+        bool firstTimeOpening = true;
         bool loadedOldFormat = false;
         bool saveInNewFormat = true;
         int SelectedIndex = -1;
@@ -84,20 +109,29 @@ namespace WADExplorer
             NewFolderButton.Enabled = true;
 
             addFileToolStripMenuItem.Enabled = true;
+            addFileToolStripMenuItem1.Enabled = true;
             ToolStripAddFileButton.Enabled = true;
             deleteToolStripMenuItem.Enabled = true;
+            deleteToolStripMenuItem1.Enabled = true;
             ToolStripDeleteButton.Enabled = true;
             newFolderToolStripMenuItem.Enabled = true;
             ToolStripNewFolderButton.Enabled = true;
             replaceWithToolStripMenuItem.Enabled = true;
+            replaceWithToolStripMenuItem1.Enabled = true;
             ToolStripReplaceButton.Enabled = true;
             extractToToolStripMenuItem.Enabled = true;
+            extractToToolStripMenuItem1.Enabled = true;
             ToolStripExtractButton.Enabled = true;
 
             SaveBTNTS.Enabled = true;
 
             FileTree.Enabled = true;
             this.Text = this.Tag + " - " + OpenPackage.FileName;
+
+            // experimental but gonna add it to the release anyways
+            testButtondffFilesToolStripMenuItem.Enabled = true;
+            ImportOBJ.Enabled = true;
+            ConvertDFFToOBJBTN.Enabled = true;
 
             UpdateTools();
         }
@@ -301,12 +335,12 @@ namespace WADExplorer
                 node.ImageIndex = 2; // config icon
             if (citem.Name.ToLower().Contains(".wav") | citem.Name.ToLower().Contains(".ogg") | citem.Name.ToLower().Contains(".mp3") | citem.Name.ToLower().Contains(".vag") | citem.Name.ToLower().Contains(".dsp"))
                 node.ImageIndex = 3; // audio icon
-            if (citem.Name.ToLower().Contains(".bmp") | citem.Name.ToLower().Contains(".png") | citem.Name.ToLower().Contains(".tga"))
+            if (citem.Name.ToLower().Contains(".bmp") | citem.Name.ToLower().Contains(".png") | citem.Name.ToLower().Contains(".tga") | citem.Name.ToLower().Contains(".dds"))
                 node.ImageIndex = 4; // image icon
             if (citem.Name.ToLower().Contains(".dff") | citem.Name.ToLower().Contains(".mdl") | citem.Name.ToLower().Contains(".tpl") | citem.Name.ToLower().Contains(".psf"))
-                node.ImageIndex = 5; // image icon
+                node.ImageIndex = 5; // model icon
             if (citem.Name.ToLower().Contains(".txt") | citem.Name.ToLower().Contains(".text"))
-                node.ImageIndex = 7; // image icon
+                node.ImageIndex = 7; // text icon
             
             // fix on selecting
             node.SelectedImageIndex = node.ImageIndex;
@@ -427,13 +461,34 @@ namespace WADExplorer
                     }
                 }
 
+                showErrors = true;
+                ProgressBar.Enabled = true;
                 if (!loadedOldFormat)
-                    OpenPackage = new Package(fileDialog.FileName);
+                    OpenPackage = new Package();
                 else
-                    OpenPackage = new PackageOld(fileDialog.FileName);
+                    OpenPackage = new PackageOld();
 
-                GenerateList();
-                InitTools();
+                OpenPackage.OnLoadFileBufferFail += OnFileBufferLoadFail;
+                OpenPackage.FileLoaded += delegate (PackageFileLoadedEventArgs ev) {
+                    float pg = (float)(ev.File.Index) / ev.ToLoad;
+                    ProgressBar.Value = (int)(pg*100);
+                    ProgressBar.Update();
+                    //StatusLabel.Text = "Loading... " + ev.File.Index.ToString() + " / " + ev.ToLoad.ToString();
+                    //StatusStripbar.Update();
+                };
+                OpenPackage.Loaded += delegate {
+                    ProgressBar.Enabled = false;
+                    ProgressBar.Value = 0;
+                    GenerateList();
+                    firstTimeOpening = true;
+                    OpenPackage.FileName = fileDialog.FileName;
+                    InitTools();
+                };
+
+
+                OpenPackage.Load(fileDialog.FileName);
+                // LoadThread_FileName = fileDialog.FileName;
+                // LoadThread.Start();
             }
         }
 
@@ -476,29 +531,37 @@ namespace WADExplorer
                 };
                 if (folder.ShowDialog() == DialogResult.OK)
                 {
+                    Console.WriteLine("=== EXTRACTION STARTED ===");
                     foreach (InsideItem item in CheckedItems)
                     {
                         string itemPath = folder.SelectedPath + @"\" + item.Name;
+
+                        Console.WriteLine(String.Format("Extracting -> {0}",Package.GetItemFullPath(item)));
+
                         if (item.IsFolder)
+                        {
                             ExtractItemChildrenTo(item, itemPath, true);
+                            Console.WriteLine("Created directory -> "+itemPath);
+                        }
                         else
                         {
                             if (File.Exists(itemPath))
                             {
-                                if (MessageBox.Show(String.Format("The file {0} already exists\nOverwrite?", itemPath), "Overwrite?", MessageBoxButtons.YesNo, MessageBoxIcon.Information)==DialogResult.No)
+                                if (MessageBox.Show(String.Format("The file {0} already exists\nOverwrite?", itemPath), "Overwrite?", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.No)
                                 {
                                     continue;
                                 }
                             }
                             byte[] buffer = OpenPackage.GetItemBuffer(item.Index);
-
-                                FileStream file = new FileStream(itemPath, FileMode.OpenOrCreate, FileAccess.Write);
-                                file.Write(buffer, 0, buffer.Length);
-                                file.Close();
+                            Console.WriteLine(String.Format(" Writing {0} bytes to this", buffer.Length));
+                            FileStream file = new FileStream(itemPath, FileMode.OpenOrCreate, FileAccess.Write);
+                            file.Write(buffer, 0, buffer.Length);
+                            file.Close();
                         }
 
                     }
                 }
+                Console.WriteLine("=== EXTRACTION ENDED ===");
                 MessageBox.Show(String.Format("Successfully extracted items to folder '{0}'!", folder.SelectedPath), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -847,6 +910,117 @@ namespace WADExplorer
         {
             loadedOldFormat = true;
             updateOldNewFMTButtons2();
+        }
+
+        private void showConsoleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AllocConsole();
+            ConsoleAllocated = true;
+        }
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
+
+        private void testButtondffFilesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (FilePG.SelectedObject == null)
+            {
+                MessageBox.Show("Nothing is selected");
+                return;
+            }
+
+            InsideItem file = FilePG.SelectedObject as InsideItem;
+            MemoryStream stream = new MemoryStream(file.Buffer);
+            DFF dff = new DFF(stream);
+            SaveFileDialog saveFileDialog = new SaveFileDialog()
+            {
+                Title = "Save DFF as OBJ",
+                Filter = "Wavefront OBJ|*.obj",
+                FileName = Path.GetFileNameWithoutExtension(file.Name)+".obj"
+            };
+            if (saveFileDialog.ShowDialog()==DialogResult.OK)
+            {
+                FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+
+                // MTL
+                string mtlFileNameNotFull = Path.GetFileNameWithoutExtension(saveFileDialog.FileName) + ".mtl";
+                string mtlFileName = Path.GetDirectoryName(saveFileDialog.FileName) + @"\" + mtlFileNameNotFull;
+
+                FileStream fmtl = new FileStream(mtlFileName, FileMode.OpenOrCreate, FileAccess.Write);
+
+                byte[] obj = Encoding.Default.GetBytes(dff.AsOBJ(mtlFileNameNotFull));
+                byte[] mtl = Encoding.Default.GetBytes(dff.AsOBJMTL());
+
+                f.Write(obj,0, obj.Length);
+                fmtl.Write(mtl, 0, mtl.Length);
+
+                f.Close();
+                fmtl.Close();
+                MessageBox.Show("Successfully exported as WaveFront OBJ!","Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            }
+        }
+
+        private void ImportOBJ_Click(object sender, EventArgs e)
+        {
+            if (FilePG.SelectedObject == null)
+            {
+                MessageBox.Show("No file is selected to import .OBJ!");
+                return;
+            }
+
+            InsideItem file = FilePG.SelectedObject as InsideItem;
+
+            OpenFileDialog openOBJ = new OpenFileDialog()
+            {
+                Title = "Open WaveFront .OBJ and Convert as DDI RenderWare DFF",
+                Filter = "WaveFront OBJ|*.obj|All Files|*.*"
+            };
+            if (openOBJ.ShowDialog() == DialogResult.OK)
+            {
+                DFF objDFF = DFF.FromOBJ(openOBJ.FileName);
+                file.Buffer = objDFF.GetBytes();
+                MessageBox.Show("Successfully imported from WaveFront OBJ!","Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            }
+        }
+
+        private void convertdffToobjToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openDFF = new OpenFileDialog()
+            {
+                Title = "Open DDI RenderWare DFF and Convert as WaveFront .OBJ",
+                Filter = "Dive File Format|*.dff|All Files|*.*"
+            };
+            if (openDFF.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openDFF.FileName, FileMode.Open, FileAccess.Read);
+                DFF dff = new DFF(stream);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted DFF to OBJ as",
+                    Filter = "Wavefront OBJ|*.obj",
+                    FileName = Path.GetFileNameWithoutExtension(openDFF.FileName) + ".obj"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+
+                    // MTL
+                    string mtlFileNameNotFull = Path.GetFileNameWithoutExtension(saveFileDialog.FileName) + ".mtl";
+                    string mtlFileName = Path.GetDirectoryName(saveFileDialog.FileName) + @"\" + mtlFileNameNotFull;
+
+                    FileStream fmtl = new FileStream(mtlFileName, FileMode.OpenOrCreate, FileAccess.Write);
+
+                    byte[] obj = Encoding.Default.GetBytes(dff.AsOBJ(mtlFileNameNotFull));
+                    byte[] mtl = Encoding.Default.GetBytes(dff.AsOBJMTL());
+
+                    f.Write(obj, 0, obj.Length);
+                    fmtl.Write(mtl, 0, mtl.Length);
+
+                    f.Close();
+                    fmtl.Close();
+                    MessageBox.Show("Successfully exported as WaveFront OBJ!");
+                }
+            }
         }
     }
 }

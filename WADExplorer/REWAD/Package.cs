@@ -9,8 +9,58 @@ using System.Diagnostics;
 
 namespace WADExplorer
 {
+    public class PackageLoadFileBufferFailureEventArgs : EventArgs
+    {
+        public Package SourcePackage;
+        public InsideItem File;
+
+        public PackageLoadFileBufferFailureEventArgs() { }
+        public PackageLoadFileBufferFailureEventArgs(InsideItem file, Package sourcePackage) { File = file; SourcePackage = sourcePackage; }
+    }
+    public delegate void OnPackageLoadFileBufferFailure(PackageLoadFileBufferFailureEventArgs e);
+    public class PackageFileLoadedEventArgs : EventArgs
+    {
+        public Package SourcePackage;
+        public InsideItem File;
+        public int ToLoad = 0;
+
+        public PackageFileLoadedEventArgs() { }
+        public PackageFileLoadedEventArgs(InsideItem file, Package sourcePackage, int toLoad = 0) { File = file; SourcePackage = sourcePackage; ToLoad = toLoad; }
+    }
+    public delegate void OnPackageFileLoaded(PackageFileLoadedEventArgs e);
+    public class PackageDoneLoadingEventArgs : EventArgs
+    {
+        public Package SourcePackage;
+
+        public PackageDoneLoadingEventArgs() { }
+        public PackageDoneLoadingEventArgs(Package sourcePackage) { SourcePackage = sourcePackage; }
+    }
+    public delegate void OnPackageDoneLoading(PackageDoneLoadingEventArgs e);
     public class Package
     {
+        // Events
+        public event OnPackageLoadFileBufferFailure OnLoadFileBufferFail;
+        public event OnPackageFileLoaded FileLoaded;
+        public event OnPackageDoneLoading Loaded;
+
+        protected void OnLoadFileFail(PackageLoadFileBufferFailureEventArgs e)
+        {
+            if (OnLoadFileBufferFail != null)
+                OnLoadFileBufferFail(e);
+        }
+
+        protected void OnFileLoad(PackageFileLoadedEventArgs e)
+        {
+            if (FileLoaded != null)
+                FileLoaded(e);
+        }
+
+        protected void DoneLoading(PackageDoneLoadingEventArgs e)
+        {
+            if (Loaded != null)
+                Loaded(e);
+        }
+
         /// <summary>
         /// [WADH] - The magic value to each .WAD file.
         /// </summary>
@@ -213,9 +263,17 @@ namespace WADExplorer
                 int off = (int)(BaseOffset + item.Offset);
                 item.Buffer = new byte[item.Size];
                 StreamPackage.Position = off;
-                for (int byteI = 0; byteI < item.Size; byteI++)
+                
+                if (off < StreamPackage.Length & (off+item.Size)<StreamPackage.Length)
                 {
-                    item.Buffer[byteI] = f.ReadByte();
+                    for (int byteI = 0; byteI < item.Size; byteI++)
+                    {
+                        item.Buffer[byteI] = f.ReadByte();
+                    }
+                }
+                else
+                {
+                    OnLoadFileFail(new PackageLoadFileBufferFailureEventArgs(item,this));
                 }
                 /*
                 StreamPackage.Position = old;
@@ -244,10 +302,18 @@ namespace WADExplorer
                 item.Index = itemId;
                 Items.Add(item);
                 StreamPackage.Position = old; // return to
+                OnFileLoad(new PackageFileLoadedEventArgs(item,this,(int)NumberOfItems));
             }
             NamesOffset = (uint) s.Position;
             // process parents
             ParseParents();
+            DoneLoading(new PackageDoneLoadingEventArgs(this));
+        }
+
+        public void Load(string filename)
+        {
+            FileStream fileS = new FileStream(filename, FileMode.Open, FileAccess.Read);
+            Load(fileS);
         }
 
         public virtual byte[] RegenerateAndReturnBuffer(bool saveInNewFormat = true)
@@ -353,8 +419,10 @@ namespace WADExplorer
 
         public virtual void Dispose()
         {
-            StreamPackage.Dispose();
-            f.Dispose();
+            if (StreamPackage!=null)
+               StreamPackage.Dispose();
+            if (f!=null)
+               f.Dispose();
         }
 
         public Package() { }
@@ -406,9 +474,17 @@ namespace WADExplorer
                 int off = (int)(BaseOffset + item.Offset);
                 item.Buffer = new byte[item.Size];
                 StreamPackage.Position = off;
-                for (int byteI = 0; byteI < item.Size; byteI++)
+
+                if (off < StreamPackage.Length & (off + item.Size) < StreamPackage.Length)
                 {
-                    item.Buffer[byteI] = f.ReadByte();
+                    for (int byteI = 0; byteI < item.Size; byteI++)
+                    {
+                        item.Buffer[byteI] = f.ReadByte();
+                    }
+                }
+                else
+                {
+                    this.OnLoadFileFail(new PackageLoadFileBufferFailureEventArgs(item, this));
                 }
                 /*
                 StreamPackage.Position = old;
@@ -437,10 +513,12 @@ namespace WADExplorer
                 item.Index = itemId;
                 Items.Add(item);
                 StreamPackage.Position = old; // return to
+                this.OnFileLoad(new PackageFileLoadedEventArgs(item, this, (int)NumberOfItems));
             }
             NamesOffset = (uint)s.Position;
             // process parents
             ParseParents();
+            this.DoneLoading(new PackageDoneLoadingEventArgs(this));
         }
 
         public virtual byte[] RegenerateAndReturnBuffer(bool saveInNewFormat = false)
