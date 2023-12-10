@@ -60,6 +60,12 @@ namespace WADExplorer
 
         public MaterialList Materials;
 
+        public Extension MeshDataExtension = new Extension();
+        public MeshContainer Meshes = new MeshContainer();
+        public Extension EndExtension = new Extension();
+
+        public Vector4 BoundingBox = new Vector4(1,1,1,1);
+
         //public Vector3 Position = new Vector3();
 
         public void Load(Stream stream)
@@ -135,14 +141,27 @@ namespace WADExplorer
         public byte[] GetBytes()
         {
             byte[] data1 = Materials.GetBytes();
-            byte[] buffer = new byte[80 + (VerticesColors.Count*4) + (Vertices.Count*12) + (TextureCoordinates.Count*8) + (TriangleIndices.Count * 8) + data1.Length];
+
+            //Meshes = MeshContainer.ChronologicalOrder(Vertices.Count);
+            MeshData mainmesh = new MeshData() { Indices = new List<uint>() };
+            foreach (TriangleIndex triangleIndex in TriangleIndices)
+            {
+                mainmesh.Indices.Add((uint)triangleIndex.Vert1);
+                mainmesh.Indices.Add((uint)triangleIndex.Vert2);
+                mainmesh.Indices.Add((uint)triangleIndex.Vert3);
+            }
+            Meshes = new MeshContainer( new List<MeshData>() { mainmesh } );
+            byte[] meshData = Meshes.GetBytes();
+
+            byte[] buffer = new byte[80 + (VerticesColors.Count*4) + (Vertices.Count*12) + (TextureCoordinates.Count*8) + (TriangleIndices.Count * 8) + data1.Length + (meshData.Length) + MeshDataExtension.GetBytes().Length + 0x18 + 0x12 - 6];
 
             MemoryStream ms = new MemoryStream(buffer);
             using (var f = new BinaryWriter(ms, Encoding.UTF8, true))
             {
-                Main = new MainChunk(buffer.Length);
+                Main = new MainChunk(buffer.Length-12);
                 GeometryChunk = new Geometry(buffer.Length-52);
                 GeometryInfo = new GeometryInfo(TriangleIndices.Count, Vertices.Count);
+                GeometryInfo.Parameter = (VerticesColors.Count * 4) + (Vertices.Count * 12) + (TextureCoordinates.Count * 8) + (TriangleIndices.Count * 8) + 0x18 + 0x10;
                 f.Write(Main.GetBytes());
                 f.Write(HeaderInfo.GetBytes());
 
@@ -162,6 +181,8 @@ namespace WADExplorer
                 {
                     f.Write(triangle.GetBytes());
                 }
+                f.Write(BoundingBox.GetBytes());
+                f.Write((long)1);
                 foreach (Vertex vert in Vertices)
                 {
                     f.Write(vert.GetBytes());
@@ -169,6 +190,15 @@ namespace WADExplorer
 
                 // materials
                 f.Write(data1);
+
+                // mesh data
+                MeshDataExtension.Parameter = meshData.Length;
+                f.Write(MeshDataExtension.GetBytes());
+
+                f.Write(meshData);
+
+                // end
+                f.Write(EndExtension.GetBytes());
             }
 
             buffer = ms.ToArray();
@@ -223,7 +253,7 @@ namespace WADExplorer
                                 {
                                     vert1 = Convert.ToInt16(parameters[1].Split('/')[0]);
                                     vert2 = Convert.ToInt16(parameters[2].Split('/')[0]);
-                                    vert3 = Convert.ToInt16(parameters[2].Split('/')[0]);
+                                    vert3 = Convert.ToInt16(parameters[3].Split('/')[0]);
                                 }
                                 else
                                 {
@@ -231,7 +261,7 @@ namespace WADExplorer
                                     vert2 = Convert.ToInt16(parameters[2].Replace('/', ' '));
                                     vert3 = Convert.ToInt16(parameters[3].Replace('/', ' '));
                                 }
-                                dff.TriangleIndices.Add(new TriangleIndex(vert1,vert2,vert3,matId));
+                                dff.TriangleIndices.Add(new TriangleIndex((short)(vert1 - 1),(short)(vert2 - 1),(short)(vert3 - 1 ), matId));
                                 break;
                             case "usemtl":
                                 string matName = parameters[1];
@@ -248,16 +278,29 @@ namespace WADExplorer
                     }
                     entry = text.ReadLine();
                 }
+
+                text.Close();
+            }
+            
+            // no texture coordinates included?
+            // well..
+            if (dff.TextureCoordinates.Count==0)
+            {
+                dff.TextureCoordinates = new List<TexCoords>(dff.Vertices.Count);
+                for (int id = 0; id<dff.Vertices.Count; id++)
+                {
+                    dff.TextureCoordinates.Add(new TexCoords(new Vector2()));
+                }
             }
 
             dff.VerticesColors = VertexColor.WhiteList(dff.Vertices.Count);
-            dff.HeaderInfo = new HeaderInfo(OldVersionGeneric, OldVersionExtra);
+            dff.HeaderInfo = new HeaderInfo(NewVersionGeneric, NewVersionExtra);
 
-            if (mtllibFileName != null)
+            string MTLfileName = Path.GetDirectoryName(filename) + @"\" + mtllibFileName;
+            if (mtllibFileName != null & File.Exists(MTLfileName))
             {
-                string fileName = Path.GetDirectoryName(filename) + @"\" + mtllibFileName;
                 Material selectedMaterial = null;
-                using (StreamReader text = File.OpenText(fileName))
+                using (StreamReader text = File.OpenText(MTLfileName))
                 {
                     string entry = text.ReadLine();
                     while (entry != null)
@@ -285,14 +328,12 @@ namespace WADExplorer
                                     float sr = Convert.ToSingle(parameters[1].Replace('.', ','));
                                     float sg = Convert.ToSingle(parameters[2].Replace('.', ','));
                                     float sb = Convert.ToSingle(parameters[3].Replace('.', ','));
-                                    selectedMaterial.Data.MaterialColor = new Color((byte)(sr * 255), (byte)(sg * 255), (byte)(sb * 255), 255);
                                     selectedMaterial.Data.Specular = (sr + sg + sb)/3;
                                     break;
                                 case "Ka":
                                     float ar = Convert.ToSingle(parameters[1].Replace('.', ','));
                                     float ag = Convert.ToSingle(parameters[2].Replace('.', ','));
                                     float ab = Convert.ToSingle(parameters[3].Replace('.', ','));
-                                    selectedMaterial.Data.MaterialColor = new Color((byte)(ar * 255), (byte)(ag * 255), (byte)(ab * 255), 255);
                                     selectedMaterial.Data.Specular = (ar + ag + ab) / 3;
                                     break;
                                 // applied if ANY texture of all kinds is used
@@ -309,8 +350,12 @@ namespace WADExplorer
                         }
                         entry = text.ReadLine();
                     }
+
+                    text.Close();
                 }
             }
+
+
 
             return dff;
         }

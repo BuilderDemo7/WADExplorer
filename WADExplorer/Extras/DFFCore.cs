@@ -53,6 +53,7 @@ namespace WADExplorer
                 f.Write(_x);
                 f.Write(_y);
                 f.Write(_z);
+                f.Write(_w);
             }
 
             bytes = stream.ToArray();
@@ -275,7 +276,9 @@ namespace WADExplorer
     }
     public abstract class Attribute
     {
-        public static int Magic = 0x1400FFFF; // not a word
+        public static readonly int OldMagic = 0x1400FFFF; 
+        public static readonly int NewMagic = 0x1803FFFF; 
+        public static int Magic = NewMagic; // not a word
         public virtual int Type { get; }
         public int Parameter { get; set; }
 
@@ -412,11 +415,11 @@ namespace WADExplorer
     }
     public class GeometryInfo : Struct
     {
-        public static new int NeutralFormat = 0x0001004D;
-        public static new int NewFormat = 0x0001004C;
-        public static new int DynamicFormat = 0x0001007D;
+        public static new int NeutralFormat = 0x0001004D; // most used in MTEOE's original edition
+        public static new int NewFormat = 0x0001004C; // most used in MTEOE's Nestle Edition objects
+        public static new int DynamicFormat = 0x0001007D; // seems to be commonly used in the vehicle models
 
-        public int Format;
+        public int Format = NeutralFormat;
         public int FacesCount;
         public int VerticesCount;
         public int Morph; // never really used in this game
@@ -508,7 +511,7 @@ namespace WADExplorer
             get { return 0x050E; }
         }
 
-        public int Flags;
+        public int Flags = 1;
         public uint NumberOfMeshes;
         public uint TotalNumberOfIndices;
         public List<MeshData> Meshes;
@@ -530,7 +533,12 @@ namespace WADExplorer
 
         public override byte[] GetAttributeBytes()
         {
-            byte[] buffer = new byte[8 + ((Meshes.Count * 4) + 4)];
+            int bufferSize = 0;
+            foreach(MeshData mesh in Meshes)
+            {
+                bufferSize += 8 + (mesh.Indices.Count * 4);
+            }
+            byte[] buffer = new byte[12 + bufferSize];
 
             MemoryStream stream = new MemoryStream(buffer);
             using (var f = new BinaryWriter(stream, Encoding.UTF8, true))
@@ -540,18 +548,38 @@ namespace WADExplorer
                 uint total = 0;
                 foreach(MeshData md in Meshes)
                 {
-                    total += md.NumberOfIndices;
+                    total += (uint)md.Indices.Count;
                 }
+                f.Write(total);
                 foreach(MeshData md in Meshes)
                 {
                     f.Write(md.GetBytes());
                 }
             }
 
+            Parameter = buffer.Length;
             return buffer;
         }
 
+        public static MeshContainer ChronologicalOrder(int verticesCount)
+        {
+            MeshContainer container = new MeshContainer();
+            container.Meshes = new List<MeshData>();
+
+            MeshData meshData = new MeshData();
+            meshData.Indices = new List<uint>();
+            for (uint id = 0; id < verticesCount; id++)
+            {
+                meshData.Indices.Add(id);
+            }
+
+            container.Meshes.Add(meshData);
+
+            return container;
+        }
+
         public MeshContainer() { }
+        public MeshContainer(List<MeshData> meshes) { Meshes = meshes; }
         public MeshContainer(Stream stream) : base(stream) { } 
     }
     public class Extension : Struct
@@ -606,14 +634,16 @@ namespace WADExplorer
         public override byte[] GetAttributeBytes()
         {
             byte[] data1 = Data.GetBytes();
-            byte[] data2 = Texture.GetBytes();
+            byte[] data2 = new byte[0];
+            if (Data.isTextured)
+                data2 = Texture.GetBytes();
             //byte[] data3 = AlphaLayer.GetBytes();
             byte[] data3 = Extension.GetBytes();
             //byte[] data5 = Extension2.GetBytes();
             byte[] buffer = new byte[data1.Length + data2.Length + data3.Length /*+ data5.Length*/];
 
             if (!Data.isTextured)
-                buffer = new byte[data1.Length /*+ data2.Length + data3.Length + data4.Length + data5.Length*/];
+                buffer = new byte[data1.Length + data3.Length /*+ data4.Length + data5.Length*/];
 
             MemoryStream ms = new MemoryStream(buffer);
             using (var f = new BinaryWriter(ms, Encoding.UTF8, true))
@@ -622,8 +652,8 @@ namespace WADExplorer
                 if (Data.isTextured)
                 {
                     f.Write(data2);
-                    f.Write(data3);
                 }
+                f.Write(data3);
             }
 
             buffer = ms.ToArray();
@@ -654,7 +684,9 @@ namespace WADExplorer
 
         public override byte[] GetAttributeBytes()
         {
-            return Encoding.ASCII.GetBytes(Value);
+            byte[] data = Encoding.ASCII.GetBytes(Value);
+            Parameter = data.Length;
+            return data;
         }
 
         public StringAttribute() { }
@@ -859,7 +891,7 @@ namespace WADExplorer
 
         public override byte[] GetAttributeBytes()
         {
-            byte[] bytes = new byte[4+(Data.Count)];
+            byte[] bytes = new byte[4+(Data.Count*4)];
             Parameter = bytes.Length;
 
             MemoryStream stream = new MemoryStream(bytes.Length);
@@ -889,7 +921,8 @@ namespace WADExplorer
             get { return 1; }
         }
 
-        public static int UnusedMagic = 0x00E4E2DC;
+        public static int UnusedMagic = 0x026DDF20;
+        public static int UnusedMagic2 = 0x00E4E2DC;
 
         public int Flags { get; set; }
         public Color MaterialColor { get; set; }
@@ -982,12 +1015,15 @@ namespace WADExplorer
                 Data.Data.Add(-1);
             }
 
+            Data.Parameter = Data.GetAttributeBytes().Length;
             byte[] data1 = Data.GetBytes();
 
             var bufferSize = data1.Length;
             foreach(Material mat in Materials)
             {
-                bufferSize += mat.GetBytes().Length;
+                byte[] buf = mat.GetBytes();
+                bufferSize += buf.Length;
+                mat.Parameter = mat.GetAttributeBytes().Length;
             }
 
             byte[] buffer = new byte[data1.Length + (bufferSize-0x14)];
@@ -1004,6 +1040,7 @@ namespace WADExplorer
 
             buffer = ms.ToArray();
             ms.Dispose();
+            Parameter = buffer.Length;
             return buffer;
         }
 

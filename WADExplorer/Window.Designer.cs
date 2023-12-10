@@ -52,6 +52,8 @@
             this.NewFormatButton = new System.Windows.Forms.ToolStripMenuItem();
             this.debuggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showConsoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.ConvertDFFToOBJBTN = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitPanel = new System.Windows.Forms.SplitContainer();
@@ -63,6 +65,7 @@
             this.addFileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.testButtondffFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImportOBJ = new System.Windows.Forms.ToolStripMenuItem();
             this.IconsList = new System.Windows.Forms.ImageList(this.components);
             this.NewFolderButton = new System.Windows.Forms.Button();
             this.AddButton = new System.Windows.Forms.Button();
@@ -95,9 +98,7 @@
             this.ToolStripReplaceButton = new System.Windows.Forms.ToolStripButton();
             this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
-            this.ImportOBJ = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.ConvertDFFToOBJBTN = new System.Windows.Forms.ToolStripMenuItem();
+            this.ConvertOBJtoDFFBTN = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -191,7 +192,8 @@
             this.saveFormatToolStripMenuItem,
             this.debuggingToolStripMenuItem,
             this.toolStripSeparator6,
-            this.ConvertDFFToOBJBTN});
+            this.ConvertDFFToOBJBTN,
+            this.ConvertOBJtoDFFBTN});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "&Edit";
@@ -269,7 +271,7 @@
             // OldFormatButton
             // 
             this.OldFormatButton.Name = "OldFormatButton";
-            this.OldFormatButton.Size = new System.Drawing.Size(180, 22);
+            this.OldFormatButton.Size = new System.Drawing.Size(98, 22);
             this.OldFormatButton.Text = "Old";
             this.OldFormatButton.Click += new System.EventHandler(this.oldToolStripMenuItem_Click);
             // 
@@ -279,7 +281,7 @@
             this.NewFormatButton.CheckOnClick = true;
             this.NewFormatButton.CheckState = System.Windows.Forms.CheckState.Checked;
             this.NewFormatButton.Name = "NewFormatButton";
-            this.NewFormatButton.Size = new System.Drawing.Size(180, 22);
+            this.NewFormatButton.Size = new System.Drawing.Size(98, 22);
             this.NewFormatButton.Text = "New";
             this.NewFormatButton.Click += new System.EventHandler(this.NewFormatButton_Click);
             // 
@@ -300,6 +302,18 @@
             this.showConsoleToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.showConsoleToolStripMenuItem.Text = "Show Console";
             this.showConsoleToolStripMenuItem.Click += new System.EventHandler(this.showConsoleToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
+            // 
+            // ConvertDFFToOBJBTN
+            // 
+            this.ConvertDFFToOBJBTN.Name = "ConvertDFFToOBJBTN";
+            this.ConvertDFFToOBJBTN.Size = new System.Drawing.Size(180, 22);
+            this.ConvertDFFToOBJBTN.Text = "Convert .dff to .obj";
+            this.ConvertDFFToOBJBTN.Click += new System.EventHandler(this.convertdffToobjToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -418,6 +432,14 @@
             this.testButtondffFilesToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.testButtondffFilesToolStripMenuItem.Text = "Export .dff as .obj";
             this.testButtondffFilesToolStripMenuItem.Click += new System.EventHandler(this.testButtondffFilesToolStripMenuItem_Click);
+            // 
+            // ImportOBJ
+            // 
+            this.ImportOBJ.Enabled = false;
+            this.ImportOBJ.Name = "ImportOBJ";
+            this.ImportOBJ.Size = new System.Drawing.Size(168, 22);
+            this.ImportOBJ.Text = "Import .obj as .dff";
+            this.ImportOBJ.Click += new System.EventHandler(this.ImportOBJ_Click);
             // 
             // IconsList
             // 
@@ -772,25 +794,12 @@
             this.ProgressBar.Size = new System.Drawing.Size(167, 15);
             this.ProgressBar.TabIndex = 5;
             // 
-            // ImportOBJ
+            // ConvertOBJtoDFFBTN
             // 
-            this.ImportOBJ.Enabled = false;
-            this.ImportOBJ.Name = "ImportOBJ";
-            this.ImportOBJ.Size = new System.Drawing.Size(168, 22);
-            this.ImportOBJ.Text = "Import .obj as .dff";
-            this.ImportOBJ.Click += new System.EventHandler(this.ImportOBJ_Click);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
-            // 
-            // ConvertDFFToOBJBTN
-            // 
-            this.ConvertDFFToOBJBTN.Name = "ConvertDFFToOBJBTN";
-            this.ConvertDFFToOBJBTN.Size = new System.Drawing.Size(180, 22);
-            this.ConvertDFFToOBJBTN.Text = "Convert .dff to .obj";
-            this.ConvertDFFToOBJBTN.Click += new System.EventHandler(this.convertdffToobjToolStripMenuItem_Click);
+            this.ConvertOBJtoDFFBTN.Name = "ConvertOBJtoDFFBTN";
+            this.ConvertOBJtoDFFBTN.Size = new System.Drawing.Size(180, 22);
+            this.ConvertOBJtoDFFBTN.Text = "Convert .obj to .dff";
+            this.ConvertOBJtoDFFBTN.Click += new System.EventHandler(this.converobjTodffToolStripMenuItem_Click);
             // 
             // Window
             // 
@@ -897,6 +906,7 @@
         private System.Windows.Forms.ToolStripMenuItem ImportOBJ;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem ConvertDFFToOBJBTN;
+        private System.Windows.Forms.ToolStripMenuItem ConvertOBJtoDFFBTN;
     }
 }
 

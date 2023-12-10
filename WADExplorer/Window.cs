@@ -1022,5 +1022,33 @@ namespace WADExplorer
                 }
             }
         }
+
+        private void converobjTodffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openOBJ = new OpenFileDialog()
+            {
+                Title = "Open WaveFront .OBJ and Convert as DDI RenderWare DFF",
+                Filter = "WaveFront OBJ|*.obj|All Files|*.*"
+            };
+            if (openOBJ.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openOBJ.FileName, FileMode.Open, FileAccess.Read);
+                DFF dff = DFF.FromOBJ(openOBJ.FileName);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted OBJ to DFF as",
+                    Filter = "Dive File Format|*.dff",
+                    FileName = Path.GetFileNameWithoutExtension(openOBJ.FileName) + ".dff"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    byte[] buffer = dff.GetBytes();
+                    FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+                    f.Write(buffer, 0, buffer.Length);
+                    f.Close();
+                    MessageBox.Show("Successfully exported as DDI RenderWare Dive File Format!");
+                }
+            }
+        }
     }
 }
