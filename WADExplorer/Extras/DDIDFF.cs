@@ -212,7 +212,6 @@ namespace WADExplorer
         {
             DFF dff = new DFF();
             dff.Vertices = new List<Vertex>();
-            dff.VerticesColors = VertexColor.WhiteList(dff.Vertices.Count);
             dff.TextureCoordinates = new List<TexCoords>();
             dff.TriangleIndices = new List<TriangleIndex>();
 
@@ -241,19 +240,6 @@ namespace WADExplorer
                                 float vy = Convert.ToSingle(parameters[2].Replace('.', ','));
                                 float vz = Convert.ToSingle(parameters[3].Replace('.', ','));
                                 dff.Vertices.Add( new Vertex(new Vector3(vx,vy,vz)) );
-                                break;
-                            // special
-                            case "vc":
-                                byte r = Convert.ToByte(parameters[1]);
-                                byte g = Convert.ToByte(parameters[2]);
-                                byte b = Convert.ToByte(parameters[3]);
-                                byte a = 255;
-                                if (parameters.Length >= 5)
-                                {
-                                    a = Convert.ToByte(parameters[4]);
-                                }
-                                dff.VerticesColors[vcId] = new VertexColor(r, g, b, a);
-                                vcId += 1;
                                 break;
                             case "vt":
                                 float x = Convert.ToSingle(parameters[1].Replace('.', ','));
@@ -308,6 +294,38 @@ namespace WADExplorer
                 }
             }
 
+            // vertex colors only
+            dff.VerticesColors = VertexColor.WhiteList(dff.Vertices.Count);
+            using (StreamReader text = File.OpenText(filename))
+            {
+                string entry = text.ReadLine();
+                while (entry != null)
+                {
+                    if (!entry.StartsWith("#"))
+                    {
+                        string[] parameters = entry.Split(' ');
+                        string command = parameters[0];
+                        switch (command)
+                        {
+                            case "vc":
+                                byte r = Convert.ToByte(parameters[1]);
+                                byte g = Convert.ToByte(parameters[2]);
+                                byte b = Convert.ToByte(parameters[3]);
+                                byte a = 255;
+                                if (parameters.Length >= 5)
+                                {
+                                    a = Convert.ToByte(parameters[4]);
+                                }
+                                dff.VerticesColors[vcId] = new VertexColor(r, g, b, a);
+                                vcId += 1;
+                                break;
+                        }
+                    }
+                    entry = text.ReadLine();
+                }
+
+                text.Close();
+            }
             dff.HeaderInfo = new HeaderInfo(NewVersionGeneric, NewVersionExtra);
 
             string MTLfileName = Path.GetDirectoryName(filename) + @"\" + mtllibFileName;
