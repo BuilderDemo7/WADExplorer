@@ -19,9 +19,12 @@ You should change it to:
 **Data/My Folder/My Texture.png** *(Include "Data" as root)*                                              
 Otherwise the game won't **load** it because it wasn't found in the *.WAD* file.
 ## Vertices
+*Using Blender 2.76...*                                                        
+
 Once you're done with your model, Select all faces and go to:               
 **Mesh > Edges >> Edge Split**, 
 to make the edges splitted. (that's how RW DFF vertices work)
+
 ## Export Settings
 - (YES) Include Edges                                   
 - (YES) Triangulate Faces (only if you didn't triangulate in your model)                                 
