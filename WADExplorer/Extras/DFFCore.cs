@@ -1021,12 +1021,11 @@ namespace WADExplorer
             var bufferSize = data1.Length;
             foreach(Material mat in Materials)
             {
-                byte[] buf = mat.GetBytes();
-                bufferSize += buf.Length;
+                bufferSize += mat.GetBytes().Length;
                 mat.Parameter = mat.GetAttributeBytes().Length;
             }
 
-            byte[] buffer = new byte[data1.Length + (bufferSize-0x14)];
+            byte[] buffer = new byte[bufferSize];
 
             MemoryStream ms = new MemoryStream(buffer);
             using (var f = new BinaryWriter(ms, Encoding.UTF8, true))

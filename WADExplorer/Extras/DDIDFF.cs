@@ -64,7 +64,7 @@ namespace WADExplorer
         public MeshContainer Meshes = new MeshContainer();
         public Extension EndExtension = new Extension();
 
-        public Vector4 BoundingBox = new Vector4(1,1,1,1);
+        public Vector4 BoundingBox = new Vector4(3,3,3,3);
 
         //public Vector3 Position = new Vector3();
 
@@ -143,14 +143,21 @@ namespace WADExplorer
             byte[] data1 = Materials.GetBytes();
 
             //Meshes = MeshContainer.ChronologicalOrder(Vertices.Count);
-            MeshData mainmesh = new MeshData() { Indices = new List<uint>() };
-            foreach (TriangleIndex triangleIndex in TriangleIndices)
+            if (Meshes == null)
             {
-                mainmesh.Indices.Add((uint)triangleIndex.Vert1);
-                mainmesh.Indices.Add((uint)triangleIndex.Vert2);
-                mainmesh.Indices.Add((uint)triangleIndex.Vert3);
+                MeshData mainmesh = new MeshData() { Indices = new List<uint>() };
+                foreach (TriangleIndex triangleIndex in TriangleIndices)
+                {
+                    mainmesh.Indices.Add((uint)triangleIndex.Vert1);
+                    mainmesh.Indices.Add((uint)triangleIndex.Vert2);
+                    mainmesh.Indices.Add((uint)triangleIndex.Vert3);
+
+                    //mainmesh.Indices.Add((uint)triangleIndex.Vert3);
+                    //mainmesh.Indices.Add((uint)triangleIndex.Vert1);
+                    //mainmesh.Indices.Add((uint)triangleIndex.Vert2);
+                }
+                Meshes = new MeshContainer(new List<MeshData>() { mainmesh });
             }
-            Meshes = new MeshContainer( new List<MeshData>() { mainmesh } );
             byte[] meshData = Meshes.GetBytes();
 
             byte[] buffer = new byte[80 + (VerticesColors.Count*4) + (Vertices.Count*12) + (TextureCoordinates.Count*8) + (TriangleIndices.Count * 8) + data1.Length + (meshData.Length) + MeshDataExtension.GetBytes().Length + 0x18 + 0x12 - 6];
@@ -213,6 +220,7 @@ namespace WADExplorer
             DFF dff = new DFF();
             dff.Vertices = new List<Vertex>();
             dff.TextureCoordinates = new List<TexCoords>();
+            List<TexCoords> texCoords = new List<TexCoords>();
             dff.TriangleIndices = new List<TriangleIndex>();
 
             dff.Materials = new MaterialList();
@@ -244,17 +252,35 @@ namespace WADExplorer
                             case "vt":
                                 float x = Convert.ToSingle(parameters[1].Replace('.', ','));
                                 float y = Convert.ToSingle(parameters[2].Replace('.', ','));
-                                dff.TextureCoordinates.Add( new TexCoords(new Vector2(x, y)) );
+                                texCoords.Add( new TexCoords(new Vector2(x, y)) );
                                 break;
                             case "f":
+                                if (parameters.Length>4)
+                                {
+                                    throw new InvalidOperationException("Please triangulate your mesh before importing");
+                                }
                                 short vert1 = 0; 
                                 short vert2 = 0; 
-                                short vert3 = 0; 
+                                short vert3 = 0;
+                                short vertc1 = -1;
+                                short vertc2 = -1;
+                                short vertc3 = -1;
                                 if (parameters[1].Contains('/'))
                                 {
-                                    vert1 = Convert.ToInt16(parameters[1].Split('/')[0]);
-                                    vert2 = Convert.ToInt16(parameters[2].Split('/')[0]);
-                                    vert3 = Convert.ToInt16(parameters[3].Split('/')[0]);
+                                    var sp1 = parameters[1].Split('/');
+                                    var sp2 = parameters[2].Split('/');
+                                    var sp3 = parameters[3].Split('/');
+                                    vert1 = Convert.ToInt16(sp1[0]);
+                                    vert2 = Convert.ToInt16(sp2[0]);
+                                    vert3 = Convert.ToInt16(sp3[0]);
+
+                                    // tex coords index
+                                    if (sp1.Length>1)
+                                        vertc1 = Convert.ToInt16(sp1[1]);
+                                    if (sp2.Length>1)
+                                        vertc2 = Convert.ToInt16(sp2[1]);
+                                    if (sp3.Length>1)
+                                        vertc3 = Convert.ToInt16(sp3[1]);
                                 }
                                 else
                                 {
@@ -262,6 +288,12 @@ namespace WADExplorer
                                     vert2 = Convert.ToInt16(parameters[2].Replace('/', ' '));
                                     vert3 = Convert.ToInt16(parameters[3].Replace('/', ' '));
                                 }
+                                if (vertc1 != -1)
+                                    dff.TextureCoordinates.Add(texCoords[vertc1-1]);
+                                if (vertc2 != -1)
+                                    dff.TextureCoordinates.Add(texCoords[vertc2-1]);
+                                if (vertc3 != -1)
+                                    dff.TextureCoordinates.Add(texCoords[vertc3-1]);
                                 dff.TriangleIndices.Add(new TriangleIndex((short)(vert1 - 1),(short)(vert2 - 1),(short)(vert3 - 1 ), matId));
                                 break;
                             case "usemtl":
@@ -287,8 +319,8 @@ namespace WADExplorer
             // well..
             if (dff.TextureCoordinates.Count!=dff.Vertices.Count)
             {
-                //dff.TextureCoordinates = new List<TexCoords>(dff.Vertices.Count - dff.TextureCoordinates.Count);
-                for (int id = 0; id< (dff.Vertices.Count - dff.TextureCoordinates.Count); id++)
+                var count = (dff.Vertices.Count - dff.TextureCoordinates.Count);
+                for (int id = 0; id<count; id++)
                 {
                     dff.TextureCoordinates.Add(new TexCoords(new Vector2()));
                 }
@@ -376,7 +408,7 @@ namespace WADExplorer
                                     string textureName = parameters[1];
                                     selectedMaterial.Data.isTextured = true;
                                     selectedMaterial.Texture = new Texture(textureName);
-                                    selectedMaterial.Texture.Structure = new TextureStruct();
+                                    selectedMaterial.Texture.Structure = new TextureStruct(true);
                                     break;
                             }
                         }
@@ -387,7 +419,29 @@ namespace WADExplorer
                 }
             }
 
+            // build up meshes
+            dff.Meshes = new MeshContainer() { Flags = 0 };
+            dff.Meshes.Meshes = new List<MeshData>();
+            int meshMatId = 0;
+            foreach (Material mat in dff.Materials.Materials) {
+                MeshData mesh = new MeshData() { Indices = new List<uint>(), MaterialIndex = (uint)meshMatId };
+                foreach (TriangleIndex triangleIndex in dff.TriangleIndices)
+                {
+                    if (triangleIndex.Material == meshMatId)
+                    {
+                        mesh.Indices.Add((uint)triangleIndex.Vert1);
+                        mesh.Indices.Add((uint)triangleIndex.Vert2);
+                        mesh.Indices.Add((uint)triangleIndex.Vert3);
 
+                        //mesh.Indices.Add((uint)triangleIndex.Vert1);
+                        //mesh.Indices.Add((uint)triangleIndex.Vert2);
+                    }
+                }
+                // add the mesh
+                dff.Meshes.Meshes.Add(mesh);
+
+                meshMatId++;
+            }
 
             return dff;
         }
