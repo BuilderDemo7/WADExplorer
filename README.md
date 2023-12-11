@@ -14,9 +14,9 @@ Using any text editor open the **.mtl** file of your .obj file,
 That's where the materials are stored into.                     
 
 Now if you see full paths to the texture like this:                                        
-**C:/Data/My Folder/My Texture.png**                                        
+**C:/My Folder/My Texture.png**                                        
 You should change it to:                              
-**Data/My Folder/My Texture.png**                                               
+**Data/My Folder/My Texture.png** *(Include "Data" as root)*                                              
 Otherwise the game won't **load** it because it wasn't found in the *.WAD* file.
 ## Vertices
 Once you're done with your model, Select all faces and go to:               
