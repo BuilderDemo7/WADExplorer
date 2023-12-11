@@ -252,12 +252,12 @@ namespace WADExplorer
                             case "vt":
                                 float x = Convert.ToSingle(parameters[1].Replace('.', ','));
                                 float y = Convert.ToSingle(parameters[2].Replace('.', ','));
-                                texCoords.Add( new TexCoords(new Vector2(x, y)) );
+                                texCoords.Add( new TexCoords(new Vector2(x, 1-y)) );
                                 break;
                             case "f":
                                 if (parameters.Length>4)
                                 {
-                                    throw new InvalidOperationException("Please triangulate your mesh before importing");
+                                    throw new InvalidOperationException("Please triangulate your mesh before importing it");
                                 }
                                 short vert1 = 0; 
                                 short vert2 = 0; 
@@ -288,12 +288,14 @@ namespace WADExplorer
                                     vert2 = Convert.ToInt16(parameters[2].Replace('/', ' '));
                                     vert3 = Convert.ToInt16(parameters[3].Replace('/', ' '));
                                 }
+                                /*
                                 if (vertc1 != -1)
                                     dff.TextureCoordinates.Add(texCoords[vertc1-1]);
                                 if (vertc2 != -1)
                                     dff.TextureCoordinates.Add(texCoords[vertc2-1]);
                                 if (vertc3 != -1)
                                     dff.TextureCoordinates.Add(texCoords[vertc3-1]);
+                                */
                                 dff.TriangleIndices.Add(new TriangleIndex((short)(vert1 - 1),(short)(vert2 - 1),(short)(vert3 - 1 ), matId));
                                 break;
                             case "usemtl":
@@ -322,12 +324,12 @@ namespace WADExplorer
                 var count = (dff.Vertices.Count - dff.TextureCoordinates.Count);
                 for (int id = 0; id<count; id++)
                 {
-                    dff.TextureCoordinates.Add(new TexCoords(new Vector2()));
+                    dff.TextureCoordinates.Add(new TexCoords(new Vector2(0,0)));
                 }
             }
 
-            // vertex colors only
             dff.VerticesColors = VertexColor.WhiteList(dff.Vertices.Count);
+            // after basic loading's loading
             using (StreamReader text = File.OpenText(filename))
             {
                 string entry = text.ReadLine();
@@ -350,6 +352,52 @@ namespace WADExplorer
                                 }
                                 dff.VerticesColors[vcId] = new VertexColor(r, g, b, a);
                                 vcId += 1;
+                                break;
+                            // process triangles one more time
+                            case "f":
+                                if (parameters.Length > 4)
+                                {
+                                    throw new InvalidOperationException("Please triangulate your mesh before importing");
+                                }
+                                short vert1 = 0;
+                                short vert2 = 0;
+                                short vert3 = 0;
+                                short vertc1 = -1;
+                                short vertc2 = -1;
+                                short vertc3 = -1;
+                                if (parameters[1].Contains('/'))
+                                {
+                                    var sp1 = parameters[1].Split('/');
+                                    var sp2 = parameters[2].Split('/');
+                                    var sp3 = parameters[3].Split('/');
+                                    vert1 = Convert.ToInt16(sp1[0]);
+                                    vert2 = Convert.ToInt16(sp2[0]);
+                                    vert3 = Convert.ToInt16(sp3[0]);
+
+                                    // tex coords index
+                                    if (sp1.Length > 1)
+                                        vertc1 = Convert.ToInt16(sp1[1]);
+                                    if (sp2.Length > 1)
+                                        vertc2 = Convert.ToInt16(sp2[1]);
+                                    if (sp3.Length > 1)
+                                        vertc3 = Convert.ToInt16(sp3[1]);
+                                }
+                                else
+                                {
+                                    vert1 = Convert.ToInt16(parameters[1].Replace('/', ' '));
+                                    vert2 = Convert.ToInt16(parameters[2].Replace('/', ' '));
+                                    vert3 = Convert.ToInt16(parameters[3].Replace('/', ' '));
+                                }
+                                if (vertc1 != -1)
+                                    dff.TextureCoordinates[vert1-1] = texCoords[vertc1-1];
+                                    //dff.TextureCoordinates.Add(texCoords[vertc1 - 1]);
+                                if (vertc2 != -1)
+                                    dff.TextureCoordinates[vert2-1] = texCoords[vertc2-1];
+                                    //dff.TextureCoordinates.Add(texCoords[vertc2 - 1]);
+                                if (vertc3 != -1)
+                                    dff.TextureCoordinates[vert3-1] = texCoords[vertc3-1];
+                                    //dff.TextureCoordinates.Add(texCoords[vertc3 - 1]);
+                                //dff.TriangleIndices.Add(new TriangleIndex((short)(vert1 - 1), (short)(vert2 - 1), (short)(vert3 - 1), matId));
                                 break;
                         }
                     }

@@ -673,6 +673,7 @@ namespace WADExplorer
         }
 
         public string Value { get; set; }
+        public bool LongNamePadding = false;
 
         protected override void AttributeLoad(Stream stream)
         {
@@ -684,7 +685,21 @@ namespace WADExplorer
 
         public override byte[] GetAttributeBytes()
         {
-            byte[] data = Encoding.ASCII.GetBytes(Value);
+            int pad = (Value.Length < 32 ? 32 : 64);
+            if (Value.Length > 64)
+                pad = 128;
+
+            if (Value.Length > 128)
+            {
+                throw new InvalidDataException("The string is longer than 128 characters");
+            }
+            byte[] data = new byte[LongNamePadding ? pad : Value.Length];
+            MemoryStream stream = new MemoryStream(data);
+            using (var f = new BinaryWriter(stream, Encoding.ASCII, true))
+            {
+                f.Write(Encoding.ASCII.GetBytes(Value));
+            }
+
             Parameter = data.Length;
             return data;
         }
@@ -758,7 +773,7 @@ namespace WADExplorer
             using (var f = new BinaryReader(stream, Encoding.ASCII, true))
             {
                 Structure = new TextureStruct(stream);
-                Name = new StringAttribute(stream);
+                Name = new StringAttribute(stream) { LongNamePadding = true };
                 AlphaLayer = new StringAttribute(stream);
                 Extension = new Extension(stream);
             }
@@ -788,7 +803,7 @@ namespace WADExplorer
         }
 
         public Texture() { }
-        public Texture(string textureName) { Name = new StringAttribute(textureName); }
+        public Texture(string textureName) { Name = new StringAttribute(textureName) { LongNamePadding = true }; }
         public Texture(Stream stream) : base(stream) { }
     }
 
