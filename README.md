@@ -9,16 +9,27 @@ Between materials make your material's name like this:
 From a range of 0 to the ID of your material. (in a chronological order actually)
 For example you want to define material 72:                     
 **Mat_71**
+### Textures
+Using any text editor open the **.mtl** file of your .obj file,                
+That's where the materials are stored into.                     
+
+Now if you see full paths to the texture like this:                                        
+**C:/Data/My Folder/My Texture.png**                                        
+You should change it to:                              
+**Data/My Folder/My Texture.png**                                               
+Otherwise the game won't **load** it because it wasn't found in the *.WAD* file.
 ## Vertices
 Once you're done with your model, Select all faces and go to:               
 **Mesh > Edges >> Edge Split**, 
 to make the edges splitted. (that's how RW DFF vertices work)
-### Export Settings
-(X) Include Edges
-(X) Triangulate Faces (only if you didn't triangulate in your model)
-(  ) Write Normals (that might make your .obj
-(X) Keep Vertex Order       
-*...(The rest you don't do anything)*  
+## Export Settings
+- (X) Include Edges                                   
+- (X) Triangulate Faces (only if you didn't triangulate in your model)                                 
+- (  ) Write Normals (that might make your .obj                           
+- (X) Keep Vertex Order                                     
+
+*...(The rest you don't do anything)* 
+ 
 # License
 *MIT License*                            
 
