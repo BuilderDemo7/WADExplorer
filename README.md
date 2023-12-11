@@ -23,10 +23,10 @@ Once you're done with your model, Select all faces and go to:
 **Mesh > Edges >> Edge Split**, 
 to make the edges splitted. (that's how RW DFF vertices work)
 ## Export Settings
-- (X) Include Edges                                   
-- (X) Triangulate Faces (only if you didn't triangulate in your model)                                 
-- (  ) Write Normals (that might make your .obj                           
-- (X) Keep Vertex Order                                     
+- (YES) Include Edges                                   
+- (YES) Triangulate Faces (only if you didn't triangulate in your model)                                 
+- (NO) Write Normals (that might make your .obj weight a bit more in some KBs)                           
+- (YES) Keep Vertex Order                                     
 
 *...(The rest you don't do anything)* 
  
