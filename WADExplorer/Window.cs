@@ -1018,7 +1018,7 @@ namespace WADExplorer
 
                     f.Close();
                     fmtl.Close();
-                    MessageBox.Show("Successfully exported as WaveFront OBJ!");
+                    MessageBox.Show("Successfully exported as WaveFront OBJ!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -1046,7 +1046,7 @@ namespace WADExplorer
                     FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
                     f.Write(buffer, 0, buffer.Length);
                     f.Close();
-                    MessageBox.Show("Successfully exported as DDI RenderWare Dive File Format!");
+                    MessageBox.Show("Successfully exported as DDI RenderWare Dive File Format!","Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
                 }
             }
         }

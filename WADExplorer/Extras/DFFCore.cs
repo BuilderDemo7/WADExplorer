@@ -86,6 +86,11 @@ namespace WADExplorer
             Load(stream);
         }
 
+        public string Format(string format)
+        {
+            return String.Format(format,_x,_y,_z);
+        }
+
         public byte[] GetBytes()
         {
             byte[] bytes = new byte[12];
@@ -124,6 +129,11 @@ namespace WADExplorer
         public Vector2(Stream stream)
         {
             Load(stream);
+        }
+
+        public string Format(string format)
+        {
+            return String.Format(format, _x, _y);
         }
 
         public byte[] GetBytes()
