@@ -3,8 +3,9 @@ DDI Games .WAD archive files explorer, it can open .WAD files for Monster Trux: 
 Choose between two formats: old and new, because DDI has changed the .WAD files format between the developed games.
 # Model Importing
 Use WaveFront .OBJ format to import your custom formats, it's pretty simple.              
-Between materials make your material's name like this:
+Between materials make your material's name like this:                            
 **Mat_materialID** -> **Mat_0**                      
+And make sure to see below for more details!
 ## Exporting in Blender
 Once you're done with your model, Select all faces and go to:               
 **Mesh > Edges >> Edge Split**, 
