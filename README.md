@@ -1,9 +1,20 @@
 # WADExplorer
 DDI Games .WAD archive files explorer, it can open .WAD files for Monster Trux: Extreme, Rig Racer 2, Offroad Extreme!, Ninja Breadman, etc.                        
 Choose between two formats: old and new, because DDI has changed the .WAD files format between the developed games.
-# Model Importer
-You can use the partially working model importer.                           
-When you import your model you must: triangulate it, don't include normals and split edges.            
+# Model Importing
+Use WaveFront .OBJ format to import your custom formats, it's pretty simple.              
+Between materials make your material's name like this:
+**Mat_materialID** -> **Mat_0**                      
+## Exporting in Blender
+Once you're done with your model, Select all faces and go to:               
+**Mesh > Edges >> Edge Split**, 
+to make the edges splitted. (that's how RW DFF vertices work)
+### Export Settings
+(X) Include Edges
+(X) Triangulate Faces (only if you didn't triangulate in your model)
+(  ) Write Normals (that might make your .obj
+(X) Keep Vertex Order       
+*...(The rest you don't do anything)*  
 # License
 *MIT License*                            
 
