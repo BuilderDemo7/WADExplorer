@@ -480,6 +480,50 @@ namespace WADExplorer
         public GeometryInfo(int faces, int vertices, int morph = 1) { FacesCount = faces; VerticesCount = vertices; Morph = morph; }
         public GeometryInfo(Stream stream) : base(stream) { }
     }
+    // PS2 Format
+    public class GeometryInfoPSF : GeometryInfo
+    {
+        public Vector4 BoundingBox = new Vector4(0,0,0,64);
+
+        protected override void AttributeLoad(Stream stream)
+        {
+            using (var f = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                Format = f.ReadInt32();
+                FacesCount = f.ReadInt32();
+                VerticesCount = f.ReadInt32();
+                Morph = f.ReadInt32();
+                BoundingBox.Load(stream);
+                stream.Position += 8;
+            }
+        }
+
+        public override byte[] GetAttributeBytes()
+        {
+            byte[] buffer = new byte[40];
+
+            MemoryStream ms = new MemoryStream(buffer);
+            using (var f = new BinaryWriter(ms, Encoding.UTF8, true))
+            {
+                if (Format == null)
+                    Format = NeutralFormat;
+
+                f.Write(Format);
+                f.Write(FacesCount);
+                f.Write(VerticesCount);
+                f.Write(Morph);
+                f.Write(BoundingBox.GetBytes());
+            }
+
+            buffer = ms.ToArray();
+            ms.Dispose();
+            return buffer;
+        }
+
+        public GeometryInfoPSF() { }
+        public GeometryInfoPSF(int faces, int vertices, int morph = 1) : base(faces,vertices,morph) { }
+        public GeometryInfoPSF(Stream stream) : base(stream) { }
+    }
     public class MeshData
     {
         public uint NumberOfIndices;
