@@ -42,6 +42,16 @@ namespace WADExplorer
             Load(stream);
         }
 
+        /// <summary>
+        /// Format Vector4 with 4 floats (X,Y,Z,W)
+        /// </summary>
+        /// <param name="format">The format to use</param>
+        /// <returns></returns>
+        public string Format(string format)
+        {
+            return String.Format(format, _x, _y, _z, _w);
+        }
+
         public byte[] GetBytes()
         {
             byte[] bytes = new byte[16];
@@ -1112,6 +1122,11 @@ namespace WADExplorer
             return new VertexColor(color.R, color.G, color.B, color.A);
         }
         public VertexColor(Stream stream) { Load(stream); }
+
+        public string Format(string format)
+        {
+            return String.Format(format, R, G, B, A);
+        }
 
         public static List<VertexColor> BlackList(int count)
         {

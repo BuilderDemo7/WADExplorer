@@ -53,7 +53,7 @@
             this.debuggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showConsoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.ConvertDFFToOBJBTN = new System.Windows.Forms.ToolStripMenuItem();
+            this.modelConvertersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitPanel = new System.Windows.Forms.SplitContainer();
@@ -63,9 +63,6 @@
             this.replaceWithToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.addFileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.testButtondffFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ImportOBJ = new System.Windows.Forms.ToolStripMenuItem();
             this.IconsList = new System.Windows.Forms.ImageList(this.components);
             this.NewFolderButton = new System.Windows.Forms.Button();
             this.AddButton = new System.Windows.Forms.Button();
@@ -98,7 +95,15 @@
             this.ToolStripReplaceButton = new System.Windows.Forms.ToolStripButton();
             this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
-            this.ConvertOBJtoDFFBTN = new System.Windows.Forms.ToolStripMenuItem();
+            this.modelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dFFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fromOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.toPLYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ConfigsConverterItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.binaryConfigFileCFBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toCFGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -192,8 +197,7 @@
             this.saveFormatToolStripMenuItem,
             this.debuggingToolStripMenuItem,
             this.toolStripSeparator6,
-            this.ConvertDFFToOBJBTN,
-            this.ConvertOBJtoDFFBTN});
+            this.modelConvertersToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "&Edit";
@@ -299,7 +303,7 @@
             this.showConsoleToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.showConsoleToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.showConsoleToolStripMenuItem.Name = "showConsoleToolStripMenuItem";
-            this.showConsoleToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.showConsoleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showConsoleToolStripMenuItem.Text = "Show Console";
             this.showConsoleToolStripMenuItem.Click += new System.EventHandler(this.showConsoleToolStripMenuItem_Click);
             // 
@@ -308,12 +312,14 @@
             this.toolStripSeparator6.Name = "toolStripSeparator6";
             this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
             // 
-            // ConvertDFFToOBJBTN
+            // modelConvertersToolStripMenuItem
             // 
-            this.ConvertDFFToOBJBTN.Name = "ConvertDFFToOBJBTN";
-            this.ConvertDFFToOBJBTN.Size = new System.Drawing.Size(180, 22);
-            this.ConvertDFFToOBJBTN.Text = "Convert .dff to .obj";
-            this.ConvertDFFToOBJBTN.Click += new System.EventHandler(this.convertdffToobjToolStripMenuItem_Click);
+            this.modelConvertersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.modelsToolStripMenuItem,
+            this.ConfigsConverterItem});
+            this.modelConvertersToolStripMenuItem.Name = "modelConvertersToolStripMenuItem";
+            this.modelConvertersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.modelConvertersToolStripMenuItem.Text = "Converters";
             // 
             // aboutToolStripMenuItem
             // 
@@ -381,18 +387,15 @@
             this.extractToToolStripMenuItem1,
             this.replaceWithToolStripMenuItem1,
             this.deleteToolStripMenuItem1,
-            this.addFileToolStripMenuItem1,
-            this.toolStripSeparator5,
-            this.testButtondffFilesToolStripMenuItem,
-            this.ImportOBJ});
+            this.addFileToolStripMenuItem1});
             this.EditContextMenu.Name = "EditContextMenu";
-            this.EditContextMenu.Size = new System.Drawing.Size(169, 142);
+            this.EditContextMenu.Size = new System.Drawing.Size(153, 92);
             // 
             // extractToToolStripMenuItem1
             // 
             this.extractToToolStripMenuItem1.Enabled = false;
             this.extractToToolStripMenuItem1.Name = "extractToToolStripMenuItem1";
-            this.extractToToolStripMenuItem1.Size = new System.Drawing.Size(168, 22);
+            this.extractToToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.extractToToolStripMenuItem1.Text = "Extract To...";
             this.extractToToolStripMenuItem1.Click += new System.EventHandler(this.ExtractButton_Click);
             // 
@@ -400,7 +403,7 @@
             // 
             this.replaceWithToolStripMenuItem1.Enabled = false;
             this.replaceWithToolStripMenuItem1.Name = "replaceWithToolStripMenuItem1";
-            this.replaceWithToolStripMenuItem1.Size = new System.Drawing.Size(168, 22);
+            this.replaceWithToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.replaceWithToolStripMenuItem1.Text = "Replace With...";
             this.replaceWithToolStripMenuItem1.Click += new System.EventHandler(this.ReplaceButton_Click);
             // 
@@ -408,7 +411,7 @@
             // 
             this.deleteToolStripMenuItem1.Enabled = false;
             this.deleteToolStripMenuItem1.Name = "deleteToolStripMenuItem1";
-            this.deleteToolStripMenuItem1.Size = new System.Drawing.Size(168, 22);
+            this.deleteToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.deleteToolStripMenuItem1.Text = "Delete";
             this.deleteToolStripMenuItem1.Click += new System.EventHandler(this.DeleteButton_Click);
             // 
@@ -416,30 +419,9 @@
             // 
             this.addFileToolStripMenuItem1.Enabled = false;
             this.addFileToolStripMenuItem1.Name = "addFileToolStripMenuItem1";
-            this.addFileToolStripMenuItem1.Size = new System.Drawing.Size(168, 22);
+            this.addFileToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.addFileToolStripMenuItem1.Text = "Add File";
             this.addFileToolStripMenuItem1.Click += new System.EventHandler(this.AddButton_Click);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(165, 6);
-            // 
-            // testButtondffFilesToolStripMenuItem
-            // 
-            this.testButtondffFilesToolStripMenuItem.Enabled = false;
-            this.testButtondffFilesToolStripMenuItem.Name = "testButtondffFilesToolStripMenuItem";
-            this.testButtondffFilesToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.testButtondffFilesToolStripMenuItem.Text = "Export .dff as .obj";
-            this.testButtondffFilesToolStripMenuItem.Click += new System.EventHandler(this.testButtondffFilesToolStripMenuItem_Click);
-            // 
-            // ImportOBJ
-            // 
-            this.ImportOBJ.Enabled = false;
-            this.ImportOBJ.Name = "ImportOBJ";
-            this.ImportOBJ.Size = new System.Drawing.Size(168, 22);
-            this.ImportOBJ.Text = "Import .obj as .dff";
-            this.ImportOBJ.Click += new System.EventHandler(this.ImportOBJ_Click);
             // 
             // IconsList
             // 
@@ -794,12 +776,74 @@
             this.ProgressBar.Size = new System.Drawing.Size(167, 15);
             this.ProgressBar.TabIndex = 5;
             // 
-            // ConvertOBJtoDFFBTN
+            // modelsToolStripMenuItem
             // 
-            this.ConvertOBJtoDFFBTN.Name = "ConvertOBJtoDFFBTN";
-            this.ConvertOBJtoDFFBTN.Size = new System.Drawing.Size(180, 22);
-            this.ConvertOBJtoDFFBTN.Text = "Convert .obj to .dff";
-            this.ConvertOBJtoDFFBTN.Click += new System.EventHandler(this.converobjTodffToolStripMenuItem_Click);
+            this.modelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dFFToolStripMenuItem});
+            this.modelsToolStripMenuItem.Name = "modelsToolStripMenuItem";
+            this.modelsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.modelsToolStripMenuItem.Text = "Models";
+            // 
+            // dFFToolStripMenuItem
+            // 
+            this.dFFToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toOBJToolStripMenuItem,
+            this.fromOBJToolStripMenuItem,
+            this.toolStripSeparator7,
+            this.toPLYToolStripMenuItem});
+            this.dFFToolStripMenuItem.Name = "dFFToolStripMenuItem";
+            this.dFFToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.dFFToolStripMenuItem.Text = "Dive File Format (DFF)";
+            // 
+            // toOBJToolStripMenuItem
+            // 
+            this.toOBJToolStripMenuItem.Name = "toOBJToolStripMenuItem";
+            this.toOBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toOBJToolStripMenuItem.Text = "To OBJ";
+            this.toOBJToolStripMenuItem.Click += new System.EventHandler(this.convertdffToobjToolStripMenuItem_Click);
+            // 
+            // fromOBJToolStripMenuItem
+            // 
+            this.fromOBJToolStripMenuItem.Name = "fromOBJToolStripMenuItem";
+            this.fromOBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.fromOBJToolStripMenuItem.Text = "From OBJ";
+            this.fromOBJToolStripMenuItem.Click += new System.EventHandler(this.converobjTodffToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
+            // 
+            // toPLYToolStripMenuItem
+            // 
+            this.toPLYToolStripMenuItem.Name = "toPLYToolStripMenuItem";
+            this.toPLYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toPLYToolStripMenuItem.Text = "To PLY";
+            this.toPLYToolStripMenuItem.Click += new System.EventHandler(this.convertdffToplyToolStripMenuItem_Click);
+            // 
+            // ConfigsConverterItem
+            // 
+            this.ConfigsConverterItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.binaryConfigFileCFBToolStripMenuItem});
+            this.ConfigsConverterItem.Name = "ConfigsConverterItem";
+            this.ConfigsConverterItem.Size = new System.Drawing.Size(180, 22);
+            this.ConfigsConverterItem.Text = "Configurations";
+            this.ConfigsConverterItem.Visible = false;
+            // 
+            // binaryConfigFileCFBToolStripMenuItem
+            // 
+            this.binaryConfigFileCFBToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toCFGToolStripMenuItem});
+            this.binaryConfigFileCFBToolStripMenuItem.Name = "binaryConfigFileCFBToolStripMenuItem";
+            this.binaryConfigFileCFBToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.binaryConfigFileCFBToolStripMenuItem.Text = "Binary Config File (CFB)";
+            // 
+            // toCFGToolStripMenuItem
+            // 
+            this.toCFGToolStripMenuItem.Name = "toCFGToolStripMenuItem";
+            this.toCFGToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toCFGToolStripMenuItem.Text = "To CFG";
+            this.toCFGToolStripMenuItem.Click += new System.EventHandler(this.toCFGToolStripMenuItem_Click);
             // 
             // Window
             // 
@@ -899,14 +943,19 @@
         private System.Windows.Forms.ToolStripMenuItem debuggingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showConsoleToolStripMenuItem;
         public System.Windows.Forms.ProgressBar ProgressBar;
-        private System.Windows.Forms.ToolStripMenuItem testButtondffFilesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem addFileToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-        private System.Windows.Forms.ToolStripMenuItem ImportOBJ;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripMenuItem ConvertDFFToOBJBTN;
-        private System.Windows.Forms.ToolStripMenuItem ConvertOBJtoDFFBTN;
+        private System.Windows.Forms.ToolStripMenuItem modelConvertersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem modelsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dFFToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toOBJToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fromOBJToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem toPLYToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ConfigsConverterItem;
+        private System.Windows.Forms.ToolStripMenuItem binaryConfigFileCFBToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toCFGToolStripMenuItem;
     }
 }
 

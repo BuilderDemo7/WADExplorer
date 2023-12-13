@@ -40,7 +40,11 @@ namespace WADExplorer
 #if DEBUG
             showMoreInfo = true;
             ShowMoreInfoBTN.Checked = true;
+
+            // TODO: Make it enabled for release when the converter is done
+            ConfigsConverterItem.Visible = true;
 #endif
+
 
             audioPlayer.Visible = false;
             audioPlayer.Location = this.PicturePanel.Location;
@@ -127,11 +131,6 @@ namespace WADExplorer
 
             FileTree.Enabled = true;
             this.Text = this.Tag + " - " + OpenPackage.FileName;
-
-            // experimental but gonna add it to the release anyways
-            testButtondffFilesToolStripMenuItem.Enabled = true;
-            ImportOBJ.Enabled = true;
-            ConvertDFFToOBJBTN.Enabled = true;
 
             UpdateTools();
         }
@@ -987,7 +986,7 @@ namespace WADExplorer
         {
             OpenFileDialog openDFF = new OpenFileDialog()
             {
-                Title = "Open DDI RenderWare DFF and Convert as WaveFront .OBJ",
+                Title = "Open DDI RenderWare DFF and Convert to WaveFront .OBJ",
                 Filter = "Dive File Format|*.dff|All Files|*.*"
             };
             if (openDFF.ShowDialog() == DialogResult.OK)
@@ -996,7 +995,7 @@ namespace WADExplorer
                 DFF dff = new DFF(stream);
                 SaveFileDialog saveFileDialog = new SaveFileDialog()
                 {
-                    Title = "Save Converted DFF to OBJ as",
+                    Title = "Save Converted DFF to WaveFront .OBJ as",
                     Filter = "Wavefront OBJ|*.obj",
                     FileName = Path.GetFileNameWithoutExtension(openDFF.FileName) + ".obj"
                 };
@@ -1027,7 +1026,7 @@ namespace WADExplorer
         {
             OpenFileDialog openOBJ = new OpenFileDialog()
             {
-                Title = "Open WaveFront .OBJ and Convert as DDI RenderWare DFF",
+                Title = "Open WaveFront .OBJ and Convert to DDI RenderWare DFF",
                 Filter = "WaveFront OBJ|*.obj|All Files|*.*"
             };
             if (openOBJ.ShowDialog() == DialogResult.OK)
@@ -1047,6 +1046,70 @@ namespace WADExplorer
                     f.Write(buffer, 0, buffer.Length);
                     f.Close();
                     MessageBox.Show("Successfully exported as DDI RenderWare Dive File Format!","Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void convertdffToplyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openDFF = new OpenFileDialog()
+            {
+                Title = "Open DDI RenderWare DFF and Convert to Stanford .PLY",
+                Filter = "Dive File Format|*.dff|All Files|*.*"
+            };
+            if (openDFF.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openDFF.FileName, FileMode.Open, FileAccess.Read);
+                DFF dff = new DFF(stream);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted DFF to PLY as",
+                    Filter = "Stanford PLY|*.ply",
+                    FileName = Path.GetFileNameWithoutExtension(openDFF.FileName) + ".ply"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+
+                    byte[] ply = Encoding.Default.GetBytes(dff.AsPLY());
+
+                    FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+
+                    f.Write(ply, 0, ply.Length);
+
+                    f.Close();
+                    MessageBox.Show("Successfully exported as Stanford PLY!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void toCFGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openCFB = new OpenFileDialog()
+            {
+                Title = "Open Binary Configuration File and Convert to CFG",
+                Filter = "Binary Configuration File|*.cfb|All Files|*.*"
+            };
+            if (openCFB.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openCFB.FileName, FileMode.Open, FileAccess.Read);
+                BinaryConfiguration cfb = new BinaryConfiguration(stream);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted CFB to CFG as",
+                    Filter = "Configuration File|*.cfg",
+                    FileName = Path.GetFileNameWithoutExtension(openCFB.FileName) + ".cfg"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+
+                    byte[] cfg = Encoding.Default.GetBytes(cfb.ToString());
+
+                    FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+
+                    f.Write(cfg, 0, cfg.Length);
+
+                    f.Close();
+                    MessageBox.Show("Successfully converted CFB to CFG!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }

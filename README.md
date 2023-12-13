@@ -2,7 +2,12 @@
 DDI Games .WAD archive files explorer, it can open .WAD files for Monster Trux: Extreme, Rig Racer 2, Offroad Extreme!, Ninja Breadman, etc.                        
 Choose between two formats: old and new, because DDI has changed the .WAD files format between the developed games.
 # Model Importing                 
-Use WaveFront .OBJ format to import your custom formats,
+Use WaveFront .OBJ format to import your custom formats.
+
+Custom data definitions on importing OBJ:
+- **bb** (x,y,z,w) > Defines bounding box (useful for big models like a map model)
+- **vc** (r,g,b,a) > Defines vertex color for a vertex (the 'a' argument is optional)
+
 ## Materials         
 Between materials make your material's name like this:                            
 **Mat_materialID** -> **Mat_0**     

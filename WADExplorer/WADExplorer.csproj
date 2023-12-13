@@ -55,6 +55,7 @@
     <Compile Include="AudioPlayer.Designer.cs">
       <DependentUpon>AudioPlayer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Extras\BinaryConfig.cs" />
     <Compile Include="Extras\DFFCore.cs" />
     <Compile Include="Extras\DDIDFF.cs" />
     <Compile Include="Extras\VAGDecoder.cs" />
