@@ -312,7 +312,7 @@ namespace WADExplorer
                                 if (matName.StartsWith("Mat_"))
                                 {
                                     matId = Convert.ToInt16(matName.Split('_')[1]);
-                                    dff.Materials.Materials.Add(new Material() { Data = new MaterialDataStruct() }); 
+                                    dff.Materials.Materials.Add(new Material() { Data = new MaterialDataStruct() { MaterialColor = new Color() } }); 
                                 }
                                 else
                                 {
@@ -717,47 +717,21 @@ namespace WADExplorer
     }
     public class PSF : DFF
     {
-
-        public GeometryInfoPSF GeometryInfo;
+        public GeometryInfoPadFormat GeometryInfo;
 
         public override void Load(Stream stream)
         {
             using (var f = new BinaryReader(stream, Encoding.UTF8, true))
             {
-                // again, ignore it!
-                /*
-                Unk1 = f.ReadInt32();
-                Unk2 = f.ReadInt32();
-                Unk3 = f.ReadInt16();
-                Unk4 = f.ReadInt32();
-                Unk5 = f.ReadInt16();
-                Unk6 = f.ReadInt32();
-                Unk7 = f.ReadInt16();
-                Unk8 = f.ReadInt32();
-                Unk9 = f.ReadInt16();
-                Unk10 = f.ReadInt32();
-                Unk11 = f.ReadInt64();
-                Unk12 = f.ReadInt32();
-                Unk13 = f.ReadInt32();
-                Unk14 = f.ReadInt16();
-                Unk15 = f.ReadInt32();
-                Unk16 = f.ReadInt16();
-                Unk17 = f.ReadInt32();
-                Unk18 = f.ReadInt16();
-                Unk19 = f.ReadInt32();
-                Unk20 = f.ReadInt16();
-                */
                 Main = new MainChunk(stream);
                 HeaderInfo = new HeaderInfo(stream);
                 GeometryChunk = new Geometry(stream);
-                GeometryInfo = new GeometryInfoPSF(stream);
+                GeometryInfo = new GeometryInfoPadFormat(stream);
                 BoundingBox = GeometryInfo.BoundingBox;
                 Materials = new MaterialList(stream);
 
                 var trianglesCount = GeometryInfo.FacesCount; //f.ReadInt32();
                 var verticesCount = GeometryInfo.VerticesCount; //f.ReadInt32();
-                //Unk21 = f.ReadInt32();
-                // skip 0xFF bytes
                 VerticesColors = new List<VertexColor>();
                 for (int unkintid = 0; unkintid < verticesCount; unkintid++)
                 {
@@ -792,6 +766,64 @@ namespace WADExplorer
 
         public PSF() { }
         public PSF(Stream stream) { Load(stream); }
+    }
+
+    // WIF
+    public class WIF : DFF
+    {
+        public GeometryInfoPadFormat GeometryInfo;
+
+        public override void Load(Stream stream)
+        {
+            using (var f = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                Main = new MainChunk(stream);
+                HeaderInfo = new HeaderInfo(stream);
+                GeometryChunk = new Geometry(stream);
+                GeometryInfo = new GeometryInfoPadFormat(stream);
+                BoundingBox = GeometryInfo.BoundingBox;
+                Materials = new MaterialList(stream);
+
+                // skip geometry list
+                stream.Position += 4;
+                stream.Position += f.ReadInt32() + 0xC;
+
+                var trianglesCount = GeometryInfo.FacesCount; //f.ReadInt32();
+                var verticesCount = GeometryInfo.VerticesCount; //f.ReadInt32();
+                VerticesColors = new List<VertexColor>();
+                for (int unkintid = 0; unkintid < verticesCount; unkintid++)
+                {
+                    VerticesColors.Add(new VertexColor(stream));
+                }
+                TextureCoordinates = new List<TexCoords>();
+                for (int id = 0; id < verticesCount; id++)
+                {
+                    TextureCoordinates.Add(new TexCoords(stream));
+                }
+                TriangleIndices = new List<TriangleIndex>();
+                for (int id = 0; id < trianglesCount; id++)
+                {
+                    TriangleIndices.Add(new TriangleIndex(stream));
+                }
+                Vertices = new List<Vertex>();
+                for (int id = 0; id < verticesCount; id++)
+                {
+                    Vertices.Add(new Vertex(stream));
+
+                }
+                if (this.GeometryInfo.Format >= WADExplorer.GeometryInfo.DynamicFormat)
+                {
+                    // test
+                    for (int id = 0; id < verticesCount; id++)
+                    {
+                        Vertices.Add(new Vertex(stream));
+                    }
+                }
+            }
+        }
+
+        public WIF() { }
+        public WIF(Stream stream) { Load(stream); }
     }
 
     // .RBS

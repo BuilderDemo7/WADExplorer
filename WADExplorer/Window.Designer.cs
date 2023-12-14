@@ -54,6 +54,18 @@
             this.showConsoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.modelConvertersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.modelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dFFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fromOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.toPLYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.collisionModelsRBSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toPLYToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.fromPLYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ConfigsConverterItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.binaryConfigFileCFBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toCFGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.SplitPanel = new System.Windows.Forms.SplitContainer();
@@ -95,18 +107,7 @@
             this.ToolStripReplaceButton = new System.Windows.Forms.ToolStripButton();
             this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
-            this.modelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dFFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fromOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.toPLYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ConfigsConverterItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.binaryConfigFileCFBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toCFGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.collisionModelsRBSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toPLYToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.fromPLYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -306,7 +307,7 @@
             this.showConsoleToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.showConsoleToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.showConsoleToolStripMenuItem.Name = "showConsoleToolStripMenuItem";
-            this.showConsoleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showConsoleToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.showConsoleToolStripMenuItem.Text = "Show Console";
             this.showConsoleToolStripMenuItem.Click += new System.EventHandler(this.showConsoleToolStripMenuItem_Click);
             // 
@@ -323,6 +324,99 @@
             this.modelConvertersToolStripMenuItem.Name = "modelConvertersToolStripMenuItem";
             this.modelConvertersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.modelConvertersToolStripMenuItem.Text = "Converters";
+            // 
+            // modelsToolStripMenuItem
+            // 
+            this.modelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dFFToolStripMenuItem,
+            this.collisionModelsRBSToolStripMenuItem});
+            this.modelsToolStripMenuItem.Name = "modelsToolStripMenuItem";
+            this.modelsToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.modelsToolStripMenuItem.Text = "Models";
+            // 
+            // dFFToolStripMenuItem
+            // 
+            this.dFFToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toOBJToolStripMenuItem,
+            this.fromOBJToolStripMenuItem,
+            this.toolStripSeparator7,
+            this.toPLYToolStripMenuItem});
+            this.dFFToolStripMenuItem.Name = "dFFToolStripMenuItem";
+            this.dFFToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.dFFToolStripMenuItem.Text = "Dive File Format (DFF)";
+            // 
+            // toOBJToolStripMenuItem
+            // 
+            this.toOBJToolStripMenuItem.Name = "toOBJToolStripMenuItem";
+            this.toOBJToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.toOBJToolStripMenuItem.Text = "To OBJ";
+            this.toOBJToolStripMenuItem.Click += new System.EventHandler(this.convertdffToobjToolStripMenuItem_Click);
+            // 
+            // fromOBJToolStripMenuItem
+            // 
+            this.fromOBJToolStripMenuItem.Name = "fromOBJToolStripMenuItem";
+            this.fromOBJToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.fromOBJToolStripMenuItem.Text = "From OBJ";
+            this.fromOBJToolStripMenuItem.Click += new System.EventHandler(this.converobjTodffToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(122, 6);
+            // 
+            // toPLYToolStripMenuItem
+            // 
+            this.toPLYToolStripMenuItem.Name = "toPLYToolStripMenuItem";
+            this.toPLYToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.toPLYToolStripMenuItem.Text = "To PLY";
+            this.toPLYToolStripMenuItem.Click += new System.EventHandler(this.convertdffToplyToolStripMenuItem_Click);
+            // 
+            // collisionModelsRBSToolStripMenuItem
+            // 
+            this.collisionModelsRBSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toPLYToolStripMenuItem1,
+            this.fromPLYToolStripMenuItem});
+            this.collisionModelsRBSToolStripMenuItem.Name = "collisionModelsRBSToolStripMenuItem";
+            this.collisionModelsRBSToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.collisionModelsRBSToolStripMenuItem.Text = "Collision Models (RBS)";
+            // 
+            // toPLYToolStripMenuItem1
+            // 
+            this.toPLYToolStripMenuItem1.Name = "toPLYToolStripMenuItem1";
+            this.toPLYToolStripMenuItem1.Size = new System.Drawing.Size(125, 22);
+            this.toPLYToolStripMenuItem1.Text = "To PLY";
+            this.toPLYToolStripMenuItem1.Click += new System.EventHandler(this.toPLYToolStripMenuItem1_Click);
+            // 
+            // fromPLYToolStripMenuItem
+            // 
+            this.fromPLYToolStripMenuItem.Name = "fromPLYToolStripMenuItem";
+            this.fromPLYToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.fromPLYToolStripMenuItem.Text = "From PLY";
+            this.fromPLYToolStripMenuItem.Click += new System.EventHandler(this.fromPLYToolStripMenuItem_Click);
+            // 
+            // ConfigsConverterItem
+            // 
+            this.ConfigsConverterItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.binaryConfigFileCFBToolStripMenuItem});
+            this.ConfigsConverterItem.Name = "ConfigsConverterItem";
+            this.ConfigsConverterItem.Size = new System.Drawing.Size(153, 22);
+            this.ConfigsConverterItem.Text = "Configurations";
+            this.ConfigsConverterItem.Visible = false;
+            // 
+            // binaryConfigFileCFBToolStripMenuItem
+            // 
+            this.binaryConfigFileCFBToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toCFGToolStripMenuItem});
+            this.binaryConfigFileCFBToolStripMenuItem.Name = "binaryConfigFileCFBToolStripMenuItem";
+            this.binaryConfigFileCFBToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.binaryConfigFileCFBToolStripMenuItem.Text = "Binary Config File (CFB)";
+            // 
+            // toCFGToolStripMenuItem
+            // 
+            this.toCFGToolStripMenuItem.Name = "toCFGToolStripMenuItem";
+            this.toCFGToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.toCFGToolStripMenuItem.Text = "To CFG";
+            this.toCFGToolStripMenuItem.Click += new System.EventHandler(this.toCFGToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -390,15 +484,16 @@
             this.extractToToolStripMenuItem1,
             this.replaceWithToolStripMenuItem1,
             this.deleteToolStripMenuItem1,
-            this.addFileToolStripMenuItem1});
+            this.addFileToolStripMenuItem1,
+            this.renameToolStripMenuItem});
             this.EditContextMenu.Name = "EditContextMenu";
-            this.EditContextMenu.Size = new System.Drawing.Size(153, 92);
+            this.EditContextMenu.Size = new System.Drawing.Size(181, 136);
             // 
             // extractToToolStripMenuItem1
             // 
             this.extractToToolStripMenuItem1.Enabled = false;
             this.extractToToolStripMenuItem1.Name = "extractToToolStripMenuItem1";
-            this.extractToToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.extractToToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.extractToToolStripMenuItem1.Text = "Extract To...";
             this.extractToToolStripMenuItem1.Click += new System.EventHandler(this.ExtractButton_Click);
             // 
@@ -406,7 +501,7 @@
             // 
             this.replaceWithToolStripMenuItem1.Enabled = false;
             this.replaceWithToolStripMenuItem1.Name = "replaceWithToolStripMenuItem1";
-            this.replaceWithToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.replaceWithToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.replaceWithToolStripMenuItem1.Text = "Replace With...";
             this.replaceWithToolStripMenuItem1.Click += new System.EventHandler(this.ReplaceButton_Click);
             // 
@@ -414,7 +509,7 @@
             // 
             this.deleteToolStripMenuItem1.Enabled = false;
             this.deleteToolStripMenuItem1.Name = "deleteToolStripMenuItem1";
-            this.deleteToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.deleteToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.deleteToolStripMenuItem1.Text = "Delete";
             this.deleteToolStripMenuItem1.Click += new System.EventHandler(this.DeleteButton_Click);
             // 
@@ -422,8 +517,8 @@
             // 
             this.addFileToolStripMenuItem1.Enabled = false;
             this.addFileToolStripMenuItem1.Name = "addFileToolStripMenuItem1";
-            this.addFileToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
-            this.addFileToolStripMenuItem1.Text = "Add File";
+            this.addFileToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.addFileToolStripMenuItem1.Text = "Add File(s)...";
             this.addFileToolStripMenuItem1.Click += new System.EventHandler(this.AddButton_Click);
             // 
             // IconsList
@@ -779,98 +874,12 @@
             this.ProgressBar.Size = new System.Drawing.Size(167, 15);
             this.ProgressBar.TabIndex = 5;
             // 
-            // modelsToolStripMenuItem
+            // renameToolStripMenuItem
             // 
-            this.modelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dFFToolStripMenuItem,
-            this.collisionModelsRBSToolStripMenuItem});
-            this.modelsToolStripMenuItem.Name = "modelsToolStripMenuItem";
-            this.modelsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.modelsToolStripMenuItem.Text = "Models";
-            // 
-            // dFFToolStripMenuItem
-            // 
-            this.dFFToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toOBJToolStripMenuItem,
-            this.fromOBJToolStripMenuItem,
-            this.toolStripSeparator7,
-            this.toPLYToolStripMenuItem});
-            this.dFFToolStripMenuItem.Name = "dFFToolStripMenuItem";
-            this.dFFToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.dFFToolStripMenuItem.Text = "Dive File Format (DFF)";
-            // 
-            // toOBJToolStripMenuItem
-            // 
-            this.toOBJToolStripMenuItem.Name = "toOBJToolStripMenuItem";
-            this.toOBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.toOBJToolStripMenuItem.Text = "To OBJ";
-            this.toOBJToolStripMenuItem.Click += new System.EventHandler(this.convertdffToobjToolStripMenuItem_Click);
-            // 
-            // fromOBJToolStripMenuItem
-            // 
-            this.fromOBJToolStripMenuItem.Name = "fromOBJToolStripMenuItem";
-            this.fromOBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.fromOBJToolStripMenuItem.Text = "From OBJ";
-            this.fromOBJToolStripMenuItem.Click += new System.EventHandler(this.converobjTodffToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
-            // 
-            // toPLYToolStripMenuItem
-            // 
-            this.toPLYToolStripMenuItem.Name = "toPLYToolStripMenuItem";
-            this.toPLYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.toPLYToolStripMenuItem.Text = "To PLY";
-            this.toPLYToolStripMenuItem.Click += new System.EventHandler(this.convertdffToplyToolStripMenuItem_Click);
-            // 
-            // ConfigsConverterItem
-            // 
-            this.ConfigsConverterItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.binaryConfigFileCFBToolStripMenuItem});
-            this.ConfigsConverterItem.Name = "ConfigsConverterItem";
-            this.ConfigsConverterItem.Size = new System.Drawing.Size(180, 22);
-            this.ConfigsConverterItem.Text = "Configurations";
-            this.ConfigsConverterItem.Visible = false;
-            // 
-            // binaryConfigFileCFBToolStripMenuItem
-            // 
-            this.binaryConfigFileCFBToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toCFGToolStripMenuItem});
-            this.binaryConfigFileCFBToolStripMenuItem.Name = "binaryConfigFileCFBToolStripMenuItem";
-            this.binaryConfigFileCFBToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.binaryConfigFileCFBToolStripMenuItem.Text = "Binary Config File (CFB)";
-            // 
-            // toCFGToolStripMenuItem
-            // 
-            this.toCFGToolStripMenuItem.Name = "toCFGToolStripMenuItem";
-            this.toCFGToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.toCFGToolStripMenuItem.Text = "To CFG";
-            this.toCFGToolStripMenuItem.Click += new System.EventHandler(this.toCFGToolStripMenuItem_Click);
-            // 
-            // collisionModelsRBSToolStripMenuItem
-            // 
-            this.collisionModelsRBSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toPLYToolStripMenuItem1,
-            this.fromPLYToolStripMenuItem});
-            this.collisionModelsRBSToolStripMenuItem.Name = "collisionModelsRBSToolStripMenuItem";
-            this.collisionModelsRBSToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.collisionModelsRBSToolStripMenuItem.Text = "Collision Models (RBS)";
-            // 
-            // toPLYToolStripMenuItem1
-            // 
-            this.toPLYToolStripMenuItem1.Name = "toPLYToolStripMenuItem1";
-            this.toPLYToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.toPLYToolStripMenuItem1.Text = "To PLY";
-            this.toPLYToolStripMenuItem1.Click += new System.EventHandler(this.toPLYToolStripMenuItem1_Click);
-            // 
-            // fromPLYToolStripMenuItem
-            // 
-            this.fromPLYToolStripMenuItem.Name = "fromPLYToolStripMenuItem";
-            this.fromPLYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.fromPLYToolStripMenuItem.Text = "From PLY";
-            this.fromPLYToolStripMenuItem.Click += new System.EventHandler(this.fromPLYToolStripMenuItem_Click);
+            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.renameToolStripMenuItem.Text = "Rename";
+            this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
             // 
             // Window
             // 
@@ -986,6 +995,7 @@
         private System.Windows.Forms.ToolStripMenuItem collisionModelsRBSToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toPLYToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem fromPLYToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
     }
 }
 

@@ -515,7 +515,7 @@ namespace WADExplorer
         public GeometryInfo(Stream stream) : base(stream) { }
     }
     // PS2 Format
-    public class GeometryInfoPSF : GeometryInfo
+    public class GeometryInfoPadFormat : GeometryInfo
     {
         public Vector4 BoundingBox = new Vector4(0,0,0,64);
 
@@ -554,9 +554,9 @@ namespace WADExplorer
             return buffer;
         }
 
-        public GeometryInfoPSF() { }
-        public GeometryInfoPSF(int faces, int vertices, int morph = 1) : base(faces,vertices,morph) { }
-        public GeometryInfoPSF(Stream stream) : base(stream) { }
+        public GeometryInfoPadFormat() { }
+        public GeometryInfoPadFormat(int faces, int vertices, int morph = 1) : base(faces,vertices,morph) { }
+        public GeometryInfoPadFormat(Stream stream) : base(stream) { }
     }
     public class MeshData
     {
@@ -825,7 +825,7 @@ namespace WADExplorer
             {
                 Unk1 = f.ReadByte();
                 Unk2 = f.ReadByte();
-                FlippedVertically = f.ReadByte() >= 1 ? true : false;
+                FlippedVertically = f.ReadByte() >= 0 ? true : false;
                 Unk3 = f.ReadByte();
             }
         }

@@ -214,7 +214,7 @@ namespace WADExplorer
                 {
                     child.Unk3 = item.Children[idx + 1].Index;
                     if (child.IsFolder & loopChain)
-                        RecastParentChainsForItem(child);
+                        RecastParentChainsForItem(child, true);
 
                     idx++;
                 }

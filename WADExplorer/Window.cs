@@ -13,6 +13,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
 
+using System.Xml;
+
 namespace WADExplorer
 {
     public partial class Window : Form
@@ -743,7 +745,9 @@ namespace WADExplorer
                 {
                     FileTree.SelectedNode.Remove(); // remove from tree
 
-                    item.Parent.Children.Remove(item);
+                    if (item.Parent!=null)
+                        item.Parent.Children.Remove(item);
+                    OpenPackage.Items.Remove(item);
                     item.Buffer = new byte[0]; // dispose buffer to free memory
                     item.Size = 0;
                     item.Name = null;
@@ -792,7 +796,8 @@ namespace WADExplorer
                     {
                         Name = Path.GetFileName(file.Name),
                         Index = OpenPackage.Items.Count,
-                        Buffer = buffer
+                        Buffer = buffer,
+                        Offset = (uint)buffer.Length
                     };
 
                     OpenPackage.Items.Add(item);
@@ -829,7 +834,9 @@ namespace WADExplorer
             {
                 Name = "New Folder",
                 Index = OpenPackage.Items.Count,
-                Children = new List<InsideItem>()
+                Children = new List<InsideItem>(),
+                Buffer = new byte[0],
+                Parent = selectedItem
             };
 
             OpenPackage.Items.Add(folder);
@@ -1171,6 +1178,86 @@ namespace WADExplorer
                     f.Close();
                     MessageBox.Show("Successfully exported as Collision Model!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+        }
+
+        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (FileTree.SelectedNode == null)
+            {
+                MessageBox.Show("Nothing is selected", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            InsideItem item = FileTree.SelectedNode.Tag as InsideItem;
+            if (item.Index==0)
+            {
+                MessageBox.Show("Root item can't be renamed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 150,
+
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterScreen,
+
+                Text = "Name"
+            };
+
+            Label textLabel = new Label()
+            {
+                Left = 50,
+                Top = 20,
+
+                Text = "Enter a new name:"
+            };
+
+            TextBox textBox = new TextBox()
+            {
+                Left = 50,
+                Top = 50,
+
+                Width = 400,
+
+                SelectedText = item.Name
+            };
+
+            Button cancel = new Button()
+            {
+                Left = 350,
+                Top = 70,
+
+                Width = 100,
+                DialogResult = DialogResult.Abort,
+
+                Text = "Cancel"
+            };
+
+            Button confirmation = new Button()
+            {
+                Left = 250,
+                Top = 70,
+
+                Width = 100,
+                DialogResult = DialogResult.OK,
+
+                Text = "OK"
+            };
+
+            confirmation.Click += delegate { prompt.Close(); };
+            cancel.Click += delegate { prompt.Close(); };
+
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+            prompt.Controls.Add(cancel);
+
+            if (prompt.ShowDialog() == DialogResult.OK)
+            {
+                item.Name = textBox.Text;
+                FileTree.SelectedNode.Text = GetItemDisplayName(item);
             }
         }
     }
