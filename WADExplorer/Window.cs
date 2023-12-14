@@ -1113,5 +1113,65 @@ namespace WADExplorer
                 }
             }
         }
+
+        private void toPLYToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openRBS = new OpenFileDialog()
+            {
+                Title = "Open Collision Model RBS and Convert to Stanford .PLY",
+                Filter = "Collision Model|*.rbs|All Files|*.*"
+            };
+            if (openRBS.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openRBS.FileName, FileMode.Open, FileAccess.Read);
+                CollisionModel rbs = new CollisionModel(stream);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted RBS to PLY as",
+                    Filter = "Stanford PLY|*.ply",
+                    FileName = Path.GetFileNameWithoutExtension(openRBS.FileName) + ".ply"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+
+                    byte[] ply = Encoding.Default.GetBytes(rbs.AsPLY());
+
+                    FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+
+                    f.Write(ply, 0, ply.Length);
+
+                    f.Close();
+                    MessageBox.Show("Successfully exported as Stanford PLY!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void fromPLYToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openPLY = new OpenFileDialog()
+            {
+                Title = "Open Stanford .PLY and Convert to Collision Model",
+                Filter = "Stanford PLY|*.ply|All Files|*.*"
+            };
+            if (openPLY.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openPLY.FileName, FileMode.Open, FileAccess.Read);
+                CollisionModel rbs = CollisionModel.FromPLY(openPLY.FileName);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted PLY to RBS as",
+                    Filter = "Collision Model|*.rbs",
+                    FileName = Path.GetFileNameWithoutExtension(openPLY.FileName) + ".rbs"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    byte[] buffer = rbs.GetBytes();
+                    FileStream f = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write);
+                    f.Write(buffer, 0, buffer.Length);
+                    f.Close();
+                    MessageBox.Show("Successfully exported as Collision Model!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
     }
 }

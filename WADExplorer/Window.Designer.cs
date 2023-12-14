@@ -104,6 +104,9 @@
             this.ConfigsConverterItem = new System.Windows.Forms.ToolStripMenuItem();
             this.binaryConfigFileCFBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toCFGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.collisionModelsRBSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toPLYToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.fromPLYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -779,7 +782,8 @@
             // modelsToolStripMenuItem
             // 
             this.modelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dFFToolStripMenuItem});
+            this.dFFToolStripMenuItem,
+            this.collisionModelsRBSToolStripMenuItem});
             this.modelsToolStripMenuItem.Name = "modelsToolStripMenuItem";
             this.modelsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.modelsToolStripMenuItem.Text = "Models";
@@ -844,6 +848,29 @@
             this.toCFGToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.toCFGToolStripMenuItem.Text = "To CFG";
             this.toCFGToolStripMenuItem.Click += new System.EventHandler(this.toCFGToolStripMenuItem_Click);
+            // 
+            // collisionModelsRBSToolStripMenuItem
+            // 
+            this.collisionModelsRBSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toPLYToolStripMenuItem1,
+            this.fromPLYToolStripMenuItem});
+            this.collisionModelsRBSToolStripMenuItem.Name = "collisionModelsRBSToolStripMenuItem";
+            this.collisionModelsRBSToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.collisionModelsRBSToolStripMenuItem.Text = "Collision Models (RBS)";
+            // 
+            // toPLYToolStripMenuItem1
+            // 
+            this.toPLYToolStripMenuItem1.Name = "toPLYToolStripMenuItem1";
+            this.toPLYToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.toPLYToolStripMenuItem1.Text = "To PLY";
+            this.toPLYToolStripMenuItem1.Click += new System.EventHandler(this.toPLYToolStripMenuItem1_Click);
+            // 
+            // fromPLYToolStripMenuItem
+            // 
+            this.fromPLYToolStripMenuItem.Name = "fromPLYToolStripMenuItem";
+            this.fromPLYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.fromPLYToolStripMenuItem.Text = "From PLY";
+            this.fromPLYToolStripMenuItem.Click += new System.EventHandler(this.fromPLYToolStripMenuItem_Click);
             // 
             // Window
             // 
@@ -956,6 +983,9 @@
         private System.Windows.Forms.ToolStripMenuItem ConfigsConverterItem;
         private System.Windows.Forms.ToolStripMenuItem binaryConfigFileCFBToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toCFGToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem collisionModelsRBSToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toPLYToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem fromPLYToolStripMenuItem;
     }
 }
 

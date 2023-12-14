@@ -41,7 +41,7 @@ namespace WADExplorer
         public MainChunk Main;
         public HeaderInfo HeaderInfo;
         public Geometry GeometryChunk;
-        public GeometryInfo GeometryInfo;
+        public virtual GeometryInfo GeometryInfo { get; set; }
 
         public static int GeometryChunkMagic = 0x0001004C;
 
@@ -717,12 +717,289 @@ namespace WADExplorer
     }
     public class PSF : DFF
     {
+
+        public GeometryInfoPSF GeometryInfo;
+
         public override void Load(Stream stream)
         {
+            using (var f = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                // again, ignore it!
+                /*
+                Unk1 = f.ReadInt32();
+                Unk2 = f.ReadInt32();
+                Unk3 = f.ReadInt16();
+                Unk4 = f.ReadInt32();
+                Unk5 = f.ReadInt16();
+                Unk6 = f.ReadInt32();
+                Unk7 = f.ReadInt16();
+                Unk8 = f.ReadInt32();
+                Unk9 = f.ReadInt16();
+                Unk10 = f.ReadInt32();
+                Unk11 = f.ReadInt64();
+                Unk12 = f.ReadInt32();
+                Unk13 = f.ReadInt32();
+                Unk14 = f.ReadInt16();
+                Unk15 = f.ReadInt32();
+                Unk16 = f.ReadInt16();
+                Unk17 = f.ReadInt32();
+                Unk18 = f.ReadInt16();
+                Unk19 = f.ReadInt32();
+                Unk20 = f.ReadInt16();
+                */
+                Main = new MainChunk(stream);
+                HeaderInfo = new HeaderInfo(stream);
+                GeometryChunk = new Geometry(stream);
+                GeometryInfo = new GeometryInfoPSF(stream);
+                BoundingBox = GeometryInfo.BoundingBox;
+                Materials = new MaterialList(stream);
 
+                var trianglesCount = GeometryInfo.FacesCount; //f.ReadInt32();
+                var verticesCount = GeometryInfo.VerticesCount; //f.ReadInt32();
+                //Unk21 = f.ReadInt32();
+                // skip 0xFF bytes
+                VerticesColors = new List<VertexColor>();
+                for (int unkintid = 0; unkintid < verticesCount; unkintid++)
+                {
+                    VerticesColors.Add(new VertexColor(stream));
+                }
+                TextureCoordinates = new List<TexCoords>();
+                for (int id = 0; id < verticesCount; id++)
+                {
+                    TextureCoordinates.Add(new TexCoords(stream));
+                }
+                TriangleIndices = new List<TriangleIndex>();
+                for (int id = 0; id < trianglesCount; id++)
+                {
+                    TriangleIndices.Add(new TriangleIndex(stream));
+                }
+                Vertices = new List<Vertex>();
+                for (int id = 0; id < verticesCount; id++)
+                {
+                    Vertices.Add(new Vertex(stream));
+
+                }
+                if (this.GeometryInfo.Format >= WADExplorer.GeometryInfo.DynamicFormat)
+                {
+                    // test
+                    for (int id = 0; id < verticesCount; id++)
+                    {
+                        Vertices.Add(new Vertex(stream));
+                    }
+                }
+            }
         }
 
         public PSF() { }
         public PSF(Stream stream) { Load(stream); }
+    }
+
+    // .RBS
+    public class CollisionModel
+    {
+        public float Unk1 = 0.2f;
+        public float Unk2 = 0.5f;
+
+        public int CollisionType = 1;
+        public int Format = 4;
+
+        public float Unk3 = 0;
+
+        public List<Vertex> Vertices;
+        public List<CollisionTriangleIndex> TriangleIndices;
+
+        public void Load(Stream stream)
+        {
+            using (var f = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                Unk1 = f.ReadSingle();
+                Unk2 = f.ReadSingle();
+                CollisionType = f.ReadInt32();
+                Format = f.ReadInt32();
+                bool hasTriangleIndices = (Format < 1024);
+                Unk3 = f.ReadSingle();
+                var count = f.ReadInt32();
+                int triangleCount = 0;
+                if (hasTriangleIndices)
+                    triangleCount = f.ReadInt32();
+                Vertices = new List<Vertex>(count);
+                for (int id = 0; id<count; id++)
+                {
+                    Vertices.Add(new Vertex(stream));
+                }
+                if (hasTriangleIndices)
+                {
+                    TriangleIndices = new List<CollisionTriangleIndex>(triangleCount);
+                    for (int id = 0; id<triangleCount; id++)
+                    {
+                        TriangleIndices.Add(new CollisionTriangleIndex(stream));
+                    }
+                }
+            }
+        }
+
+        public byte[] GetBytes()
+        {
+            var bufferSize = 0x18+(Vertices.Count*12);
+            if (Format < 1024)
+            {
+                bufferSize += 4+(TriangleIndices.Count*6);
+            }
+            byte[] buffer = new byte[bufferSize];
+
+            MemoryStream ms = new MemoryStream(buffer);
+            using (var f = new BinaryWriter(ms, Encoding.UTF8, true))
+            {
+                f.Write(Unk1);
+                f.Write(Unk2);
+                f.Write(CollisionType);
+                f.Write(Format);
+                f.Write(Unk3);
+                f.Write(Vertices.Count);
+                if (Format < 1024 | TriangleIndices.Count>0 )
+                {
+                    Format = 4;
+                    f.Write(TriangleIndices.Count);
+                }
+                foreach(Vertex vert in Vertices)
+                {
+                    f.Write(vert.GetBytes());
+                }
+                if (Format < 1024)
+                {
+                    foreach(CollisionTriangleIndex triangleIndex in TriangleIndices)
+                    {
+                        f.Write(triangleIndex.GetBytes());
+                    }
+                }
+            }
+
+            buffer = ms.ToArray();
+            ms.Dispose();
+            return buffer;
+        }
+
+        public string AsPLY()
+        {
+            StringWriter fcs = new StringWriter();
+            // write faces
+            int facesCount = 0;
+            if (Format < 1024)
+            {
+                foreach (CollisionTriangleIndex cti in TriangleIndices)
+                {
+                    fcs.WriteLine($"3 {cti.Vert1} {cti.Vert2} {cti.Vert3}");
+                    facesCount += 1;
+                }
+            }
+            StringWriter ply = new StringWriter();
+            ply.WriteLine("ply");
+            ply.WriteLine("format ascii 1.0");
+            ply.WriteLine("comment Automatically generated by WADExplorer");
+            ply.WriteLine($"element vertex {Vertices.Count}");
+
+            ply.Write("property float x\nproperty float y\nproperty float z\n");
+            ply.WriteLine($"element face {facesCount}");
+            ply.WriteLine("property list uchar uint vertex_indices");
+
+            ply.WriteLine("end_header");
+
+            // write vertices
+            for (int vertId = 0; vertId < Vertices.Count; vertId++)
+            {
+                Vertex vert = Vertices[vertId];
+
+                ply.WriteLine(vert.Position.Format("{0:F6} {1:F6} {2:F6}").Replace(',', '.'));
+            }
+
+            return ply.ToString()+fcs.ToString();
+        }
+        public static CollisionModel FromPLY(string filename)
+        {
+            CollisionModel rbs = new CollisionModel();
+
+            // force format that contains triangle indices
+            rbs.Format = 4;
+
+            bool readVert = false;
+            bool readFace = false;
+            int vertId = 0;
+            int vertCount = 0;
+            int faceId = 0;
+            int faceCount = 0;
+            using (StreamReader text = File.OpenText(filename))
+            {
+                string entry = text.ReadLine();
+                while (entry != null)
+                {
+                    if (!entry.StartsWith("#"))
+                    {
+                        string[] parameters = entry.Split(' ');
+                        string command = parameters[0];
+
+                        if (readFace)
+                        {
+                            if (parameters.Length > 4)
+                            {
+                                throw new InvalidOperationException("Please triangulate your mesh before importing it");
+                            }
+                            short vert1 = Convert.ToInt16(parameters[1].Replace('/', ' '));
+                            short vert2 = Convert.ToInt16(parameters[2].Replace('/', ' '));
+                            short vert3 = Convert.ToInt16(parameters[3].Replace('/', ' '));
+                            rbs.TriangleIndices.Add(new CollisionTriangleIndex((short)(vert1), (short)(vert2), (short)(vert3)));
+                            faceId++;
+                            if (faceId > faceCount)
+                            {
+                                readVert = false;
+                                readFace = false;
+                                break; // finish
+                            }
+                        }
+                        if (readVert)
+                        {
+                            float vx = Convert.ToSingle(parameters[0].Replace('.', ','));
+                            float vy = Convert.ToSingle(parameters[1].Replace('.', ','));
+                            float vz = Convert.ToSingle(parameters[2].Replace('.', ','));
+                            rbs.Vertices.Add(new Vertex(new Vector3(vx, vy, vz)));
+                            vertId++;
+                            if (vertId > vertCount-1)
+                            {
+                                readVert = false;
+                                readFace = true;
+                            }
+                        }
+                        
+                        switch (command)
+                        {
+                            case "end_header":
+                                readFace = false; 
+                                readVert = true;
+                                break;
+                        }
+                        if (parameters.Length>2)
+                        {
+                            if (parameters[1]=="face")
+                            {
+                                faceCount = Convert.ToInt32(parameters[2].Replace('/', ' '));
+                                rbs.TriangleIndices = new List<CollisionTriangleIndex>(faceCount);
+                            }
+                            else if (parameters[1] == "vertex")
+                            {
+                                vertCount = Convert.ToInt32(parameters[2].Replace('/', ' '));
+                                rbs.Vertices = new List<Vertex>(vertCount);
+                            }
+                        }
+                        
+                    }
+                    entry = text.ReadLine();
+                }
+
+                text.Close();
+            }
+
+            return rbs;
+        }
+        public CollisionModel() { }
+        public CollisionModel(Stream stream) { Load(stream); }
     }
 }

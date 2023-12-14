@@ -57,7 +57,7 @@
     </Compile>
     <Compile Include="Extras\BinaryConfig.cs" />
     <Compile Include="Extras\DFFCore.cs" />
-    <Compile Include="Extras\DDIDFF.cs" />
+    <Compile Include="Extras\Models.cs" />
     <Compile Include="Extras\VAGDecoder.cs" />
     <Compile Include="REWAD\InsideItem.cs" />
     <Compile Include="REWAD\Package.cs" />

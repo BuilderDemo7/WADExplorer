@@ -294,6 +294,40 @@ namespace WADExplorer
         public TriangleIndex(short v1, short v2, short v3, short mat) { Vert1 = v1; Vert2 = v2; Vert3 = v3; Material = mat;  }
         public TriangleIndex(Stream stream) { Load(stream); }
     }
+    public class CollisionTriangleIndex
+    {
+        public short Vert1;
+        public short Vert2;
+        public short Vert3;
+        public void Load(Stream stream)
+        {
+            using (var f = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                Vert1 = f.ReadInt16();
+                Vert2 = f.ReadInt16();
+                Vert3 = f.ReadInt16();
+            }
+        }
+        public byte[] GetBytes()
+        {
+            byte[] bytes = new byte[6];
+
+            MemoryStream stream = new MemoryStream(bytes);
+            using (var f = new BinaryWriter(stream, Encoding.UTF8, true))
+            {
+                f.Write(Vert1);
+                f.Write(Vert2);
+                f.Write(Vert3);
+            }
+
+            bytes = stream.ToArray();
+            stream.Dispose();
+            return bytes;
+        }
+        public CollisionTriangleIndex() { }
+        public CollisionTriangleIndex(short v1, short v2, short v3) { Vert1 = v1; Vert2 = v2; Vert3 = v3; }
+        public CollisionTriangleIndex(Stream stream) { Load(stream); }
+    }
     public abstract class Attribute
     {
         public static readonly int OldMagic = 0x1400FFFF; 
