@@ -83,6 +83,16 @@ namespace WADExplorer
         [Browsable(false)]
         public byte[] Buffer { get; set; }
 
+        public InsideItem FindFirstChildByName(string name, bool checkSiblings = false)
+        {
+            foreach(InsideItem child in Children)
+            {
+                if (child.Name.ToLower() == name.ToLower())
+                    return child;
+            }
+            return null;
+        }
+
         public InsideItem() { }
         public InsideItem(
             bool folder,

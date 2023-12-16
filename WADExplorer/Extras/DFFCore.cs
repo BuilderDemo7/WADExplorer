@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
+using System.Windows;
+using System.Windows.Media.Media3D;
+using System.Windows.Media;
+
 // Hello, dear coder/viewer/programmer
 //   Get ready to get lost because there are
 //   Many classes in this code
@@ -13,6 +17,18 @@ using System.Diagnostics;
 
 namespace WADExplorer
 {
+    // useful for XZY formats ig
+    public enum Vector3Puzzle : int
+    {
+        XYZ = 0,
+        XZY = 1,
+        ZXY = 2,
+        ZYX = 3,
+
+        YZX = 4,
+        YXZ = 5
+    }
+
     // vectors cores ;)
     public class Vector4
     {
@@ -101,6 +117,48 @@ namespace WADExplorer
             return String.Format(format,_x,_y,_z);
         }
 
+        public static implicit operator Vector3D(Vector3 vector3)
+        {
+            return new Vector3D((double)vector3.X, (double)vector3.Y, (double)vector3.Z);
+        }
+
+        public static implicit operator Vector3(Vector3D vector3D)
+        {
+            return new Vector3((float)vector3D.X, (float)vector3D.Y, (float)vector3D.Z);
+        }
+
+        public static implicit operator Point3D(Vector3 vector3)
+        {
+            return new Point3D((float)vector3.X, (float)vector3.Y, (float)vector3.Z);
+        }
+
+        public static implicit operator Vector3(Point3D p3d)
+        {
+            return new Vector3((float)p3d.X, (float)p3d.Y, (float)p3d.Z);
+        }
+
+        public Vector3 Puzzle(Vector3Puzzle puzzle)
+        {
+            switch (puzzle)
+            {
+                case Vector3Puzzle.XYZ:
+                default:
+                    return new Vector3(_x, _y, _z);
+
+                case Vector3Puzzle.XZY:
+                    return new Vector3(_x, _z, _y);
+                case Vector3Puzzle.ZXY:
+                    return new Vector3(_z, _x, _y);
+                case Vector3Puzzle.ZYX:
+                    return new Vector3(_z, _y, _x);
+
+                case Vector3Puzzle.YZX:
+                    return new Vector3(_y, _z, _x);
+                case Vector3Puzzle.YXZ:
+                    return new Vector3(_y, _x, _z);
+            }
+        }
+
         public byte[] GetBytes()
         {
             byte[] bytes = new byte[12];
@@ -144,6 +202,16 @@ namespace WADExplorer
         public string Format(string format)
         {
             return String.Format(format, _x, _y);
+        }
+
+        public static implicit operator Point(Vector2 vector2)
+        {
+            return new Point((double)vector2.X, (double)vector2.Y);
+        }
+
+        public static implicit operator Vector2(Point p)
+        {
+            return new Vector2((float)p.X, (float)p.Y);
         }
 
         public byte[] GetBytes()
@@ -221,8 +289,13 @@ namespace WADExplorer
             stream.Dispose();
             return bytes;
         }
+        public TexCoords Flip()
+        {
+            return new TexCoords(1 - Coords.X, 1 - Coords.Y);
+        }
         public TexCoords() { }
         public TexCoords(Vector2 uv) { Coords = uv; }
+        public TexCoords(float u, float v) { Coords = new Vector2(u,v); }
         public TexCoords(Stream stream) { Load(stream); }
     }
     public class Vertex

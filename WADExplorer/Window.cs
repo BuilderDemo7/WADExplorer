@@ -15,10 +15,21 @@ using System.Runtime.InteropServices;
 
 using System.Xml;
 
+// 3D view namespaces, etc.
+using HelixToolkit;
+using HelixToolkit.Wpf;
+
+using System.Windows.Media.Media3D;
+
+// texture
+using System.Windows.Media.Imaging;
+
 namespace WADExplorer
 {
     public partial class Window : Form
     {
+        ViewPanel Viewport;
+        ModelVisual3D Scene = new ModelVisual3D();
         AudioPlayer audioPlayer = new AudioPlayer();
         public static bool ConsoleAllocated = false;
         public bool showErrors = true;
@@ -36,6 +47,97 @@ namespace WADExplorer
             }
         }
 
+        public void ShowViewport()
+        {
+            ViewportEHost.Visible = true;
+        }
+        public void HideViewport()
+        {
+            ViewportEHost.Visible = false;
+        }
+        public void ShowModelInViewport(List<Vertex> vertices, List<TexCoords> textureCoordinates, List<TriangleIndex> triangleIndices, List<Material> RWmaterials)
+        {
+            // clear stuff that is already in
+            Scene.Children.Clear();
+
+            ModelVisual3D model = new ModelVisual3D();
+
+            int matId = 0;
+            foreach (Material mat in RWmaterials)
+            {
+                ModelVisual3D submodel = new ModelVisual3D();
+                MeshBuilder mb = new MeshBuilder();
+                foreach (TriangleIndex triangle in triangleIndices)
+                {
+                    if (triangle.Material != matId)
+                    {
+                        continue;
+                    }
+
+                    Vertex vert1 = vertices[triangle.Vert1];
+                    Vertex vert2 = vertices[triangle.Vert2];
+                    Vertex vert3 = vertices[triangle.Vert3];
+
+                    System.Windows.Point uv1 = (System.Windows.Point)textureCoordinates[triangle.Vert1].Coords;
+                    System.Windows.Point uv2 = (System.Windows.Point)textureCoordinates[triangle.Vert2].Coords;
+                    System.Windows.Point uv3 = (System.Windows.Point)textureCoordinates[triangle.Vert3].Coords;
+                    
+                    // I don't know this
+                    // the UV still is screwed up
+                    /*
+                    if(mat.Data.isTextured)
+                    {
+                        if (!mat.Texture.Structure.FlippedVertically)
+                        {
+                            uv1 = (System.Windows.Point)textureCoordinates[triangle.Vert1].Flip().Coords;
+                            uv2 = (System.Windows.Point)textureCoordinates[triangle.Vert2].Flip().Coords;
+                            uv3 = (System.Windows.Point)textureCoordinates[triangle.Vert3].Flip().Coords;
+                        }
+                    }
+                    */
+
+                    mb.AddTriangle((Point3D)vert3.Position.Puzzle(Vector3Puzzle.XZY), (Point3D)vert2.Position.Puzzle(Vector3Puzzle.XZY), (Point3D)vert1.Position.Puzzle(Vector3Puzzle.XZY), uv3, uv2, uv1);
+                }
+                matId++;
+
+                System.Windows.Media.Color color = System.Windows.Media.Color.FromArgb(mat.Data.MaterialColor.A, mat.Data.MaterialColor.R, mat.Data.MaterialColor.G, mat.Data.MaterialColor.B);
+                System.Windows.Media.SolidColorBrush colorBrush = new System.Windows.Media.SolidColorBrush(color);
+                DiffuseMaterial defaultmaterial = new DiffuseMaterial(colorBrush);
+
+                System.Windows.Media.Media3D.Material material = null;
+                if (!mat.Data.isTextured)
+                    material = defaultmaterial;
+                else
+                {
+                    InsideItem texture = OpenPackage.GetChildByPath(mat.Texture.Name.Value.Replace("\0",""));
+                    if (texture != null)
+                    {
+                        BitmapImage bitmap = new BitmapImage();
+
+                        bitmap.BeginInit();
+                        bitmap.StreamSource = new MemoryStream(texture.Buffer);
+                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmap.EndInit();
+                        bitmap.Freeze();
+
+                        System.Windows.Media.ImageBrush tex = new System.Windows.Media.ImageBrush(bitmap);
+                        material = new DiffuseMaterial(tex);
+                    }
+                    // texture not found then
+                    else
+                    {
+                        material = defaultmaterial;
+                    }
+                }
+
+                GeometryModel3D geo = new GeometryModel3D(mb.ToMesh(true), material);
+
+                submodel.Content = geo;
+
+                Scene.Children.Add(submodel);
+            }
+        }
+
         public Window()
         {
             InitializeComponent();
@@ -47,7 +149,13 @@ namespace WADExplorer
             ConfigsConverterItem.Visible = true;
 #endif
 
+            // 3D viewport
+            Viewport = new ViewPanel();
+            Scene = new ModelVisual3D();
+            Viewport.Viewport3D.Children.Add(Scene);
+            ViewportEHost.Child = Viewport;
 
+            // audio player
             audioPlayer.Visible = false;
             audioPlayer.Location = this.PicturePanel.Location;
             audioPlayer.Size = new Size(357, 74);
@@ -217,6 +325,7 @@ namespace WADExplorer
                 PicturePanel.HorizontalScroll.Maximum = PreviewPictureBox.Image.Width;
                 PicturePanel.VerticalScroll.Maximum = PreviewPictureBox.Image.Height;
                 //PicturePanel.AutoScroll = true;
+                HideViewport();
             }
             else if (item.Name.ToLower().Contains(".wav") | item.Name.ToLower().Contains(".ogg") | item.Name.ToLower().Contains(".mp3"))
             {
@@ -242,6 +351,7 @@ namespace WADExplorer
                 audioPlayer.Visible = true;
                 TextPreview.Visible = false;
                 AnyLabel.Visible = false;
+                HideViewport();
             }
             // special sound format
             else if (item.Name.ToLower().Contains(".vag"))
@@ -265,9 +375,22 @@ namespace WADExplorer
                 audioPlayer.Visible = true;
                 TextPreview.Visible = false;
                 AnyLabel.Visible = false;
+                HideViewport();
+            }
+            // model
+            else if (item.Name.ToLower().Contains(".dff"))
+            {
+                DFF dff = new DFF(new MemoryStream(item.Buffer));
+
+                // show it
+                ShowViewport();
+
+                // load it in the viewport
+                ShowModelInViewport(dff.Vertices,dff.TextureCoordinates,dff.TriangleIndices,dff.Materials.Materials);
             }
             else if (item.Name.ToLower().Contains(".txt") | item.Name.ToLower().Contains(".cfg") | item.Name.ToLower().Contains(".dir"))
             {
+                HideViewport();
                 PreviewUnavailableLabel.Visible = false;
 
                 PreviewPictureBox.Visible = false;
@@ -287,6 +410,7 @@ namespace WADExplorer
             }
             else if (item.IsFolder)
             {
+                HideViewport();
                 PreviewUnavailableLabel.Visible = false;
 
                 PreviewPictureBox.Visible = false;
@@ -1286,6 +1410,16 @@ namespace WADExplorer
                     x3d.Save(saveFileDialog.FileName);
                     MessageBox.Show("Successfully exported as XML X3D!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Shift & e.KeyCode == Keys.R)
+            {
+                Viewport.Viewport3D.Camera.LookDirection = new Vector3D(8.5, -8.5, 4);
+                Viewport.Viewport3D.Camera.Position = new Point3D(-8.5, 8.5, 4);
+                Viewport.Viewport3D.Camera.UpDirection = new Vector3D(0,0,1);
             }
         }
     }

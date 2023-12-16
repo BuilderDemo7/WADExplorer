@@ -316,6 +316,32 @@ namespace WADExplorer
             Load(fileS);
         }
 
+        // Example: Data/[Cache]
+        public InsideItem GetChildByPath(string path)
+        {
+            char sep = '/';
+            if (path.Contains(@"\"))
+                sep = (char)(byte)(0x5C);
+
+            
+
+            string[] pathNames = path.Split(sep);
+
+            if (pathNames[0].Contains(":"))
+            {
+                throw new InvalidOperationException("The path cannot be a path to a disk unit");
+            }
+
+            InsideItem r = Items[0].FindFirstChildByName(pathNames[0].Replace("\0", ""));
+            for (int id = 1; id < pathNames.Length; id++)
+            {
+                string p = pathNames[id];
+
+                r = r.FindFirstChildByName(p);
+            }
+            return r;
+        }
+
         public virtual byte[] RegenerateAndReturnBuffer(bool saveInNewFormat = true)
         {
             if (saveInNewFormat==false)
