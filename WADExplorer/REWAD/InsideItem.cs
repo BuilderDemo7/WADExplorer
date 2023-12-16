@@ -47,7 +47,8 @@ namespace WADExplorer
         /// The offset relative to the base offset to the name of files.
         /// </summary>
         [ReadOnly(true)]
-        [Browsable(false)]
+        [Browsable(true)]
+        [DisplayName("Name Offset")]
         public int NameOffset { get; set; }
 
         /// <summary>

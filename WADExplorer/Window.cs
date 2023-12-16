@@ -73,6 +73,11 @@ namespace WADExplorer
                     {
                         continue;
                     }
+                    // out of range skip
+                    if (triangle.Vert1>vertices.Count - 1 | triangle.Vert2 > vertices.Count - 1 | triangle.Vert3 > vertices.Count - 1)
+                    {
+                        continue;
+                    }
 
                     Vertex vert1 = vertices[triangle.Vert1];
                     Vertex vert2 = vertices[triangle.Vert2];

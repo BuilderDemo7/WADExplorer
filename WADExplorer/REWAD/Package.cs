@@ -225,9 +225,9 @@ namespace WADExplorer
                 }
             }
         }
-        public static int GetNextLineOf(int from)
+        public static int GetNextLineOf(int from, int range = 16)
         {
-            return 16 * ((from / 16) + 1);
+            return range * ((from / range) + 1);
         }
         public virtual void Load(Stream s)
         {
@@ -367,6 +367,7 @@ namespace WADExplorer
                     continue;
 
                 bufferSize += item.Name.Length + 1;
+                stringBufferSize += item.Name.Length + 1;
             }
 
             // base offset
@@ -459,8 +460,10 @@ namespace WADExplorer
         }
     }
     // Seems to be mostly used in old version of DDI games
-    // Such as MT: AE, Rig Racer 2, etc...
+    // Such as MTAE, Rig Racer 2, etc...
     
+    // And it seems it is required to have padding? weird.
+
     // The file header's size is lowered to 24 bytes and the file headers are slightly changed.
     public class PackageOld : Package
     {
@@ -547,7 +550,7 @@ namespace WADExplorer
             this.DoneLoading(new PackageDoneLoadingEventArgs(this));
         }
 
-        public virtual byte[] RegenerateAndReturnBuffer(bool saveInNewFormat = false)
+        public override byte[] RegenerateAndReturnBuffer(bool saveInNewFormat = false)
         {
             if (saveInNewFormat)
             {
@@ -569,6 +572,7 @@ namespace WADExplorer
                     continue;
 
                 bufferSize += item.Name.Length + 1;
+                stringBufferSize += item.Name.Length + 1;
             }
 
             // base offset
@@ -638,6 +642,7 @@ namespace WADExplorer
                 // and finally... write buffer data
                 foreach (InsideItem item in Items)
                 {
+                    //dataStream.Position = BaseOffset+item.Offset; // prepare position
                     f.Write(item.Buffer);
                 }
             }
