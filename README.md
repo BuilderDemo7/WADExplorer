@@ -26,11 +26,14 @@ Otherwise the game won't **load** it because it wasn't found in the *.WAD* file.
 ## Vertices
 *Using Blender 2.76...*                                                        
 
+For more compatibility do this:                               
 Once you're done with your model, Select all faces and go to:               
 **Mesh > Edges >> Edge Split**, 
-to make the edges splitted. (that's how RW DFF vertices work)
+to make the edges splitted. 
 
 ## Export Settings
+If your model editor have these options then make them unchecked or checked according to the list below:                                  
+
 - (YES) Include Edges                                   
 - (YES) Triangulate Faces (only if you didn't triangulate in your model)                                 
 - (NO) Write Normals (that might make your .obj weight a bit more in some KBs)                           
