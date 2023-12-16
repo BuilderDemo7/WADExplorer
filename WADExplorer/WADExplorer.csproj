@@ -59,6 +59,7 @@
     <Compile Include="Extras\DFFCore.cs" />
     <Compile Include="Extras\Models.cs" />
     <Compile Include="Extras\VAGDecoder.cs" />
+    <Compile Include="Extras\X3D.cs" />
     <Compile Include="REWAD\InsideItem.cs" />
     <Compile Include="REWAD\Package.cs" />
     <Compile Include="Window.cs">
