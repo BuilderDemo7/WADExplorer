@@ -1260,5 +1260,33 @@ namespace WADExplorer
                 FileTree.SelectedNode.Text = GetItemDisplayName(item);
             }
         }
+
+        private void toX3DToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openDFF = new OpenFileDialog()
+            {
+                Title = "Open DDI RenderWare DFF and Convert to XML X3D",
+                Filter = "Dive File Format|*.dff|All Files|*.*"
+            };
+            if (openDFF.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openDFF.FileName, FileMode.Open, FileAccess.Read);
+                DFF dff = new DFF(stream);
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Title = "Save Converted DFF to X3D as",
+                    Filter = "XML X3D|*.x3d",
+                    FileName = Path.GetFileNameWithoutExtension(openDFF.FileName) + ".x3d"
+                };
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    X3D x3d = X3D.FromDFF(dff);
+                    x3d.Generate(); // activate!
+                    
+                    x3d.Save(saveFileDialog.FileName);
+                    MessageBox.Show("Successfully exported as XML X3D!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
     }
 }

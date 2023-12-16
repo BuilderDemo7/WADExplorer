@@ -108,6 +108,7 @@
             this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
             this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toX3DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -331,7 +332,7 @@
             this.dFFToolStripMenuItem,
             this.collisionModelsRBSToolStripMenuItem});
             this.modelsToolStripMenuItem.Name = "modelsToolStripMenuItem";
-            this.modelsToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.modelsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.modelsToolStripMenuItem.Text = "Models";
             // 
             // dFFToolStripMenuItem
@@ -340,7 +341,8 @@
             this.toOBJToolStripMenuItem,
             this.fromOBJToolStripMenuItem,
             this.toolStripSeparator7,
-            this.toPLYToolStripMenuItem});
+            this.toPLYToolStripMenuItem,
+            this.toX3DToolStripMenuItem});
             this.dFFToolStripMenuItem.Name = "dFFToolStripMenuItem";
             this.dFFToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.dFFToolStripMenuItem.Text = "Dive File Format (DFF)";
@@ -487,7 +489,7 @@
             this.addFileToolStripMenuItem1,
             this.renameToolStripMenuItem});
             this.EditContextMenu.Name = "EditContextMenu";
-            this.EditContextMenu.Size = new System.Drawing.Size(181, 136);
+            this.EditContextMenu.Size = new System.Drawing.Size(153, 114);
             // 
             // extractToToolStripMenuItem1
             // 
@@ -881,6 +883,13 @@
             this.renameToolStripMenuItem.Text = "Rename";
             this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
             // 
+            // toX3DToolStripMenuItem
+            // 
+            this.toX3DToolStripMenuItem.Name = "toX3DToolStripMenuItem";
+            this.toX3DToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toX3DToolStripMenuItem.Text = "To X3D";
+            this.toX3DToolStripMenuItem.Click += new System.EventHandler(this.toX3DToolStripMenuItem_Click);
+            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -996,6 +1005,7 @@
         private System.Windows.Forms.ToolStripMenuItem toPLYToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem fromPLYToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toX3DToolStripMenuItem;
     }
 }
 
