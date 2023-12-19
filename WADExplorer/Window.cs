@@ -41,6 +41,7 @@ namespace WADExplorer
             if (!showErrors)
                 return;
 
+            e.File.Buffer = new byte[0]; // make it non-null 
             if (MessageBox.Show($"The file {e.File.Name} (0x{e.File.CRC:X4}/0x{e.File.Offset:X4}) has failed to load it's buffer\nExpect some errors for now on!\n\nShow more errors?","Warning",MessageBoxButtons.YesNo,MessageBoxIcon.Warning)==DialogResult.No)
             {
                 showErrors = false;
@@ -561,7 +562,7 @@ namespace WADExplorer
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 if (OpenPackage != null)
-                    OpenPackage.Dispose();
+                    OpenPackage.DisposeStreams();
 
                 // old format detection
                 FileStream fs = new FileStream(fileDialog.FileName, FileMode.Open, FileAccess.Read);
@@ -593,6 +594,8 @@ namespace WADExplorer
 
                 showErrors = true;
                 ProgressBar.Enabled = true;
+
+                // format
                 if (!loadedOldFormat)
                     OpenPackage = new Package();
                 else
@@ -603,8 +606,6 @@ namespace WADExplorer
                     float pg = (float)(ev.File.Index) / ev.ToLoad;
                     ProgressBar.Value = (int)(pg*100);
                     ProgressBar.Update();
-                    //StatusLabel.Text = "Loading... " + ev.File.Index.ToString() + " / " + ev.ToLoad.ToString();
-                    //StatusStripbar.Update();
                 };
                 OpenPackage.Loaded += delegate {
                     ProgressBar.Enabled = false;
@@ -615,10 +616,8 @@ namespace WADExplorer
                     InitTools();
                 };
 
-
+                // all set up, let's rock!
                 OpenPackage.Load(fileDialog.FileName);
-                // LoadThread_FileName = fileDialog.FileName;
-                // LoadThread.Start();
             }
         }
 
@@ -657,7 +656,8 @@ namespace WADExplorer
             {
                 FolderBrowserDialog folder = new FolderBrowserDialog()
                 {
-                    Description = "Choose a folder to extract the checked files"
+                    Description = "Choose a folder to extract the checked files",
+                    SelectedPath = Path.GetDirectoryName(OpenPackage.FileName)
                 };
                 if (folder.ShowDialog() == DialogResult.OK)
                 {
@@ -730,7 +730,7 @@ namespace WADExplorer
 
                 if (saveFile.ShowDialog() == DialogResult.OK)
                 {
-                    byte[] buffer = OpenPackage.GetItemBuffer(SelectedIndex);
+                    byte[] buffer = OpenPackage.Items[SelectedIndex].Buffer; //OpenPackage.GetItemBuffer(SelectedIndex);
 
                     FileStream file = new FileStream(saveFile.FileName, FileMode.Create, FileAccess.Write);
                     file.Write(buffer, 0, buffer.Length);
@@ -755,11 +755,12 @@ namespace WADExplorer
             {
                 byte[] buffer = OpenPackage.RegenerateAndReturnBuffer(saveInNewFormat);
 
-                OpenPackage.Dispose(); // dispose old stream
+                OpenPackage.DisposeStreams(); // dispose old stream
                 FileStream file = new FileStream(saveFile.FileName, FileMode.OpenOrCreate, FileAccess.Write);
                 file.Write(buffer, 0, buffer.Length);
                 file.Close();
 
+                this.Text = this.Tag + " - " + OpenPackage.FileName;
                 MessageBox.Show(String.Format("Successfully saved to '{0}'!", saveFile.FileName), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -810,7 +811,7 @@ namespace WADExplorer
 
             byte[] buffer = OpenPackage.RegenerateAndReturnBuffer(saveInNewFormat);
 
-            OpenPackage.Dispose(); // dispose old stream
+            OpenPackage.DisposeStreams(); // dispose old stream
             FileStream file = new FileStream(OpenPackage.FileName, FileMode.OpenOrCreate, FileAccess.Write);
             file.Write(buffer, 0, buffer.Length);
             file.Close();
@@ -926,11 +927,17 @@ namespace WADExplorer
                         Name = Path.GetFileName(file.Name),
                         Index = OpenPackage.Items.Count,
                         Buffer = buffer,
-                        Offset = (uint)buffer.Length
+                        Offset = (uint)buffer.Length,
+
+                        FolderStartIndex = -1,
+                        Children = new List<InsideItem>()
                     };
 
                     OpenPackage.Items.Add(item);
                     selectedItem.Children.Add(item);
+
+                    // fix
+                    OpenPackage.RecastParentChainsForItem(selectedItem);
                 }
 
                 // update the list
@@ -965,11 +972,17 @@ namespace WADExplorer
                 Index = OpenPackage.Items.Count,
                 Children = new List<InsideItem>(),
                 Buffer = new byte[0],
-                Parent = selectedItem
+                Parent = selectedItem,
+
+                // this folder is empty so add this
+                FolderStartIndex = -1
             };
 
             OpenPackage.Items.Add(folder);
             selectedItem.Children.Add(folder);
+
+            // fix
+            OpenPackage.RecastParentChainsForItem(selectedItem,true);
 
             GenerateList();
         }
@@ -1425,6 +1438,73 @@ namespace WADExplorer
                 Viewport.Viewport3D.Camera.LookDirection = new Vector3D(8.5, -8.5, 4);
                 Viewport.Viewport3D.Camera.Position = new Point3D(-8.5, 8.5, 4);
                 Viewport.Viewport3D.Camera.UpDirection = new Vector3D(0,0,1);
+            }
+        }
+
+        private void NewFromFolderBTN_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog folder = new FolderBrowserDialog()
+            {
+                Description = "Select a folder to create a new .WAD archive file from"
+            };
+            if (folder.ShowDialog()==DialogResult.OK)
+            {
+                OpenPackage = Package.FromDirectory(folder.SelectedPath);
+                OpenPackage.FileName = folder.SelectedPath + ".wad"; // append file name from folder
+                GenerateList();
+                InitTools();
+            }
+        }
+
+        private void NewEmpty_Click(object sender, EventArgs e)
+        {
+            OpenPackage = new Package()
+            {
+                Items = new List<InsideItem>(),
+                BaseOffset = 0
+            };
+            OpenPackage.Items.Add(new InsideItem() { Children = new List<InsideItem>(), CRC = -1 } );
+            OpenPackage.FileName = Path.GetFullPath("untitled") + ".wad";
+            GenerateList();
+            InitTools();
+        }
+
+        private void AddFolderEditMenuBTN_Click(object sender, EventArgs e)
+        {
+            if (FilePG.SelectedObject == null)
+            {
+                MessageBox.Show("Nothing is selected", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            InsideItem item = FilePG.SelectedObject as InsideItem;
+            if (item.IsFolder==false)
+            {
+                MessageBox.Show("Selected item is not a folder", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            FolderBrowserDialog folder = new FolderBrowserDialog()
+            {
+                Description = "Choose a folder to add files from",
+                SelectedPath = Path.GetFullPath(OpenPackage.FileName).Replace(Path.GetFileName(OpenPackage.FileName), "")
+            };
+            if (folder.ShowDialog() == DialogResult.OK)
+            {
+                InsideItem newFolder = new InsideItem()
+                {
+                    Name = Path.GetFileName(folder.SelectedPath),
+
+                    Children = new List<InsideItem>(),
+                    IsFolder = true,
+                    Buffer = new byte[0],
+                    Offset = 0,
+                    Size = 0,
+                    Index = OpenPackage.Items.Count
+                };
+                item.Children.Add(newFolder);
+                OpenPackage.Items.Add(newFolder);
+
+                OpenPackage.AddItemsFromDirectory(folder.SelectedPath, newFolder, true);
+                GenerateList();
             }
         }
     }

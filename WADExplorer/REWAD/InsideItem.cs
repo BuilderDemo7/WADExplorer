@@ -75,10 +75,10 @@ namespace WADExplorer
 
         //[ReadOnly(true)]
         //[Browsable(false)]
-        public int ParentId { get; set; }
+        public int Priority { get; set; }
 
-        public int Unk2 { get; set; }
-        public int Unk3 { get; set; }
+        public int FolderStartIndex { get; set; }
+        public int FolderNextItemIndex { get; set; }
 
         [ReadOnly(true)]
         [Browsable(false)]
@@ -104,9 +104,9 @@ namespace WADExplorer
             uint totalsize,
             uint size,
 
-            int parentID,
-            int unk2,
-            int unk3,
+            int priority,
+            int folderSI,
+            int folderNII,
 
             byte[] buffer = null,
             InsideItem parent = null
@@ -121,9 +121,9 @@ namespace WADExplorer
             TotalSize = totalsize;
             Size = size;
 
-            ParentId = parentID;
-            Unk2 = unk2;
-            Unk3 = unk3;
+            Priority = priority;
+            FolderStartIndex = folderSI;
+            FolderNextItemIndex = folderNII;
 
             if (buffer != null)
                Buffer = buffer;
@@ -131,7 +131,7 @@ namespace WADExplorer
                 Parent = parent;
 
             // force this to be a folder if
-            if (Offset == 0 && Size == 0 && Unk2!=-1)
+            if (FolderStartIndex != -1)
                 IsFolder = true;
         }
     }

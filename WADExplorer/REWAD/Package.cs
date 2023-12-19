@@ -174,7 +174,7 @@ namespace WADExplorer
                 if (item.IsFolder)
                 {
                     item.Children = new List<InsideItem>();
-                    int id = item.Unk2;
+                    int id = item.FolderStartIndex;
 
                     if (id != -1)
                     {
@@ -182,10 +182,10 @@ namespace WADExplorer
                         {
                             item.Children.Add(Items[id]);
                             Items[id].Parent = item;
-                            if (id == Items[id].Unk3)
+                            if (id == Items[id].FolderNextItemIndex)
                                 break;
 
-                            id = Items[id].Unk3;
+                            id = Items[id].FolderNextItemIndex;
                         }
                     }
                     /*
@@ -206,13 +206,18 @@ namespace WADExplorer
             if (!item.IsFolder)
                 return;
 
-            item.Unk2 = item.Children[0].Index;
+            item.FolderStartIndex = item.Children[0].Index;
+
+            if (item.Children.Count == 0)
+                item.FolderStartIndex = -1;
+
             int idx = 0;
             foreach (InsideItem child in item.Children)
             {
+                child.Priority = item.Priority;
                 if (idx != item.Children.Count-1)
                 {
-                    child.Unk3 = item.Children[idx + 1].Index;
+                    child.FolderNextItemIndex = item.Children[idx + 1].Index;
                     if (child.IsFolder & loopChain)
                         RecastParentChainsForItem(child, true);
 
@@ -220,7 +225,7 @@ namespace WADExplorer
                 }
                 else
                 {
-                    child.Unk3 = -1;
+                    child.FolderNextItemIndex = -1;
                     break;
                 }
             }
@@ -329,7 +334,7 @@ namespace WADExplorer
 
             if (pathNames[0].Contains(":"))
             {
-                throw new InvalidOperationException("The path cannot be a path to a disk unit");
+                throw new InvalidOperationException("The path cannot be a path to a hard drive");
             }
 
             InsideItem r = Items[0].FindFirstChildByName(pathNames[0].Replace("\0", ""));
@@ -384,7 +389,7 @@ namespace WADExplorer
             dataStream.SetLength(bufferSize);
 
             // regenerate parent chain
-            RecastParentChainsForItem(Items[0], true);
+            //RecastParentChainsForItem(Items[0], true);
             using (var f = new BinaryWriter(dataStream, Encoding.UTF8, false))
             {
                 f.Write(Magic);
@@ -418,10 +423,10 @@ namespace WADExplorer
                     f.Write(item.Buffer.Length);
                     f.Write(item.Buffer.Length);
 
-                    f.Write(item.ParentId);
+                    f.Write(item.Priority);
 
-                    f.Write(item.Unk2);
-                    f.Write(item.Unk3);
+                    f.Write(item.FolderStartIndex);
+                    f.Write(item.FolderNextItemIndex);
 
                     lastOffset += (int)item.Buffer.Length;
                 }
@@ -444,7 +449,7 @@ namespace WADExplorer
             return dataStream.GetBuffer();
         }
 
-        public virtual void Dispose()
+        public virtual void DisposeStreams()
         {
             if (StreamPackage!=null)
                StreamPackage.Dispose();
@@ -452,7 +457,96 @@ namespace WADExplorer
                f.Dispose();
         }
 
+        /// <summary>
+        /// Adds items from a directory.
+        /// </summary>
+        /// <param name="directory">The directory to add items as files or folders.</param>
+        /// <param name="relativeTo">The item where the result is added, will be attached to the root of this package if null.</param>
+        /// <param name="addSiblings">Specifies if it will add more items from each folder like a chain.</param>
+        public void AddItemsFromDirectory(string directory, InsideItem relativeTo = null, bool addSiblings = true)
+        {
+            if (!Directory.Exists(directory))
+                throw new InvalidOperationException("The directory does not exist");
+
+            string[] files = Directory.GetFiles(directory);
+            string[] directories = Directory.GetDirectories(directory);
+
+            InsideItem _r = Items[0]; // root
+            if (relativeTo != null)
+                _r = relativeTo;
+
+            // files
+            foreach (string entry in files)
+            {
+                InsideItem item = new InsideItem()
+                {
+                    Name = Path.GetFileName(entry),
+
+                    Offset = 0,
+                    Size = 0,
+                    Buffer = new byte[0],
+                    Children = new List<InsideItem>()
+                };
+                FileStream file = new FileStream(entry, FileMode.Open, FileAccess.Read);
+                using (var f = new BinaryReader(file, Encoding.UTF8, false))
+                {
+                    item.Buffer = f.ReadBytes((int)file.Length);
+                    item.Size = (uint)item.Buffer.Length;
+                }
+
+                item.Index = Items.Count;
+                Items.Add(item);
+                _r.Children.Add(item);
+            }
+            // directories
+            foreach (string entry in directories)
+            {
+                InsideItem item = new InsideItem()
+                {
+                    Name = Path.GetFileName(entry),
+
+                    Offset = 0,
+                    Size = 0,
+                    Buffer = new byte[0],
+                    Children = new List<InsideItem>(),
+                    IsFolder = true
+                };
+                if (addSiblings)
+                   AddItemsFromDirectory(entry, item, true);
+
+                item.Index = Items.Count;
+                Items.Add(item);
+                _r.Children.Add(item);
+            }
+        }
+
+        public static Package FromDirectory(string directory)
+        {
+            Package pkg = new Package(new List<InsideItem>(1) {
+
+                new InsideItem()
+                {
+                    Children = new List<InsideItem>(),
+                    Offset = 0,
+                    Size = 0,
+                    CRC = -1,
+                    Buffer = new byte[0]
+                }
+
+                }
+
+            );
+
+            // add the items
+            pkg.AddItemsFromDirectory(directory, null, true);
+
+            pkg.RecastParentChainsForItem(pkg.Items[0],true);
+
+            return pkg;
+        }
+
         public Package() { }
+        public Package(List<InsideItem> items) { Items = items; }
         public Package(string filename) {
             FileStream fileS = new FileStream(filename, FileMode.Open, FileAccess.Read);
             Load(fileS);
@@ -589,7 +683,7 @@ namespace WADExplorer
             dataStream.SetLength(bufferSize);
 
             // regenerate parent chain
-            RecastParentChainsForItem(Items[0], true);
+            //RecastParentChainsForItem(Items[0], true);
             using (var f = new BinaryWriter(dataStream, Encoding.UTF8, false))
             {
                 f.Write(Magic);
@@ -623,10 +717,10 @@ namespace WADExplorer
                     //f.Write(item.Buffer.Length);
                     f.Write(item.Buffer.Length);
 
-                    f.Write(item.ParentId);
+                    f.Write(item.Priority);
 
-                    f.Write(item.Unk2);
-                    f.Write(item.Unk3);
+                    f.Write(item.FolderStartIndex);
+                    f.Write(item.FolderNextItemIndex);
 
                     lastOffset += (int)item.Buffer.Length;
                 }
@@ -650,7 +744,7 @@ namespace WADExplorer
             return dataStream.GetBuffer();
         }
 
-        public override void Dispose()
+        public override void DisposeStreams()
         {
             StreamPackage.Dispose();
             f.Dispose();
