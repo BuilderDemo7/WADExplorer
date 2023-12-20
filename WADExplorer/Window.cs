@@ -242,6 +242,7 @@ namespace WADExplorer
             extractToToolStripMenuItem.Enabled = true;
             extractToToolStripMenuItem1.Enabled = true;
             ToolStripExtractButton.Enabled = true;
+            addFolderToolStripMenuItem.Enabled = true;
 
             SaveBTNTS.Enabled = true;
 
@@ -462,15 +463,15 @@ namespace WADExplorer
                 node.ImageIndex = 6; // root icon
             if (citem.IsFolder)
                 node.ImageIndex = 1; // folder icon
-            if (citem.Name.ToLower().Contains(".cfg") | citem.Name.ToLower().Contains(".cfb"))
+            if (citem.Name.ToLower().EndsWith(".cfg") | citem.Name.ToLower().EndsWith(".cfb"))
                 node.ImageIndex = 2; // config icon
-            if (citem.Name.ToLower().Contains(".wav") | citem.Name.ToLower().Contains(".ogg") | citem.Name.ToLower().Contains(".mp3") | citem.Name.ToLower().Contains(".vag") | citem.Name.ToLower().Contains(".dsp"))
+            if (citem.Name.ToLower().EndsWith(".wav") | citem.Name.ToLower().EndsWith(".ogg") | citem.Name.ToLower().EndsWith(".mp3") | citem.Name.ToLower().EndsWith(".vag") | citem.Name.ToLower().EndsWith(".dsp"))
                 node.ImageIndex = 3; // audio icon
-            if (citem.Name.ToLower().Contains(".bmp") | citem.Name.ToLower().Contains(".png") | citem.Name.ToLower().Contains(".tga") | citem.Name.ToLower().Contains(".dds"))
+            if (citem.Name.ToLower().EndsWith(".bmp") | citem.Name.ToLower().EndsWith(".png") | citem.Name.ToLower().EndsWith(".tga") | citem.Name.ToLower().EndsWith(".dds"))
                 node.ImageIndex = 4; // image icon
-            if (citem.Name.ToLower().Contains(".dff") | citem.Name.ToLower().Contains(".mdl") | citem.Name.ToLower().Contains(".tpl") | citem.Name.ToLower().Contains(".psf"))
+            if (citem.Name.ToLower().EndsWith(".dff") | citem.Name.ToLower().EndsWith(".mdl") | citem.Name.ToLower().EndsWith(".tpl") | citem.Name.ToLower().EndsWith(".psf"))
                 node.ImageIndex = 5; // model icon
-            if (citem.Name.ToLower().Contains(".txt") | citem.Name.ToLower().Contains(".text"))
+            if (citem.Name.ToLower().EndsWith(".txt") | citem.Name.ToLower().EndsWith(".text"))
                 node.ImageIndex = 7; // text icon
             
             // fix on selecting
@@ -878,10 +879,18 @@ namespace WADExplorer
                     if (item.Parent!=null)
                         item.Parent.Children.Remove(item);
                     OpenPackage.Items.Remove(item);
+                    // change indices stuff, as one item was deleted then decrease index of each one after this item
+                    for (int i = item.Index; i<OpenPackage.Items.Count; i++)
+                    {
+                        OpenPackage.Items[i].Index -= 1;
+                    }
                     item.Buffer = new byte[0]; // dispose buffer to free memory
                     item.Size = 0;
                     item.Name = null;
                     item = null; // fully dispose it
+
+                    // patch the package from glitches
+                    OpenPackage.RecastParentChainsForItem(OpenPackage.Items[0], true);
                 }
             }
         }
@@ -930,7 +939,8 @@ namespace WADExplorer
                         Offset = (uint)buffer.Length,
 
                         FolderStartIndex = -1,
-                        Children = new List<InsideItem>()
+                        Children = new List<InsideItem>(),
+                        IsFolder = false
                     };
 
                     OpenPackage.Items.Add(item);
@@ -938,6 +948,8 @@ namespace WADExplorer
 
                     // fix
                     OpenPackage.RecastParentChainsForItem(selectedItem);
+                    // force force force nooooot to be a folder please
+                    item.IsFolder = false;
                 }
 
                 // update the list
@@ -1493,6 +1505,7 @@ namespace WADExplorer
                 {
                     Name = Path.GetFileName(folder.SelectedPath),
 
+
                     Children = new List<InsideItem>(),
                     IsFolder = true,
                     Buffer = new byte[0],
@@ -1503,7 +1516,13 @@ namespace WADExplorer
                 item.Children.Add(newFolder);
                 OpenPackage.Items.Add(newFolder);
 
+                // basically add the thing
                 OpenPackage.AddItemsFromDirectory(folder.SelectedPath, newFolder, true);
+
+                // ok, patch the thing...
+                OpenPackage.RecastParentChainsForItem(item,false);
+                OpenPackage.RecastParentChainsForItem(newFolder,true);
+
                 GenerateList();
             }
         }

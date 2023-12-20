@@ -206,20 +206,24 @@ namespace WADExplorer
             if (!item.IsFolder)
                 return;
 
-            item.FolderStartIndex = item.Children[0].Index;
 
             if (item.Children.Count == 0)
                 item.FolderStartIndex = -1;
+            else
+                item.FolderStartIndex = item.Children[0].Index;
 
             int idx = 0;
             foreach (InsideItem child in item.Children)
             {
                 child.Priority = item.Priority;
+
+                child.FolderStartIndex = -1;
+                if (child.IsFolder & loopChain)
+                    RecastParentChainsForItem(child, true);
+                
                 if (idx != item.Children.Count-1)
                 {
                     child.FolderNextItemIndex = item.Children[idx + 1].Index;
-                    if (child.IsFolder & loopChain)
-                        RecastParentChainsForItem(child, true);
 
                     idx++;
                 }
@@ -389,7 +393,7 @@ namespace WADExplorer
             dataStream.SetLength(bufferSize);
 
             // regenerate parent chain
-            //RecastParentChainsForItem(Items[0], true);
+            RecastParentChainsForItem(Items[0], true);
             using (var f = new BinaryWriter(dataStream, Encoding.UTF8, false))
             {
                 f.Write(Magic);
@@ -415,7 +419,9 @@ namespace WADExplorer
                     f.Write(item.NameOffset);
 
                     f.Write(item.CRC);
-                    if (item.Offset != 0)
+
+                    // change offset if it's a folder
+                    if (!item.IsFolder)
                     {
                         item.Offset = (uint)lastOffset;
                     }
@@ -485,7 +491,8 @@ namespace WADExplorer
                     Offset = 0,
                     Size = 0,
                     Buffer = new byte[0],
-                    Children = new List<InsideItem>()
+                    Children = new List<InsideItem>(),
+                    IsFolder = false
                 };
                 FileStream file = new FileStream(entry, FileMode.Open, FileAccess.Read);
                 using (var f = new BinaryReader(file, Encoding.UTF8, false))
@@ -683,7 +690,7 @@ namespace WADExplorer
             dataStream.SetLength(bufferSize);
 
             // regenerate parent chain
-            //RecastParentChainsForItem(Items[0], true);
+            RecastParentChainsForItem(Items[0], true);
             using (var f = new BinaryWriter(dataStream, Encoding.UTF8, false))
             {
                 f.Write(Magic);
@@ -709,7 +716,7 @@ namespace WADExplorer
                     f.Write(item.NameOffset);
 
                     //f.Write(item.CRC);
-                    if (item.Offset != 0)
+                    if (!item.IsFolder)
                     {
                         item.Offset = (uint)lastOffset;
                     }

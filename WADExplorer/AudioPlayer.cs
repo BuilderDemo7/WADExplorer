@@ -43,15 +43,18 @@ namespace WADExplorer
             SaveFileDialog saveFile = new SaveFileDialog()
             {
                 FileName = AudioDescription.Text,
-                Filter = "All files|*.*"
+                Filter = "Microsoft WAV|*.wav|All files|*.*"
             };
 
             if (saveFile.ShowDialog() == DialogResult.OK)
             {
                 byte[] buffer = new byte[audioStream.Length];
-                audioStream.Read(buffer, 0, buffer.Length);
+                //audioStream.Read(buffer, 0, buffer.Length);
 
-                FileStream file = new FileStream(saveFile.FileName, FileMode.Create, FileAccess.Write);
+                using (var f = new BinaryReader(audioStream, Encoding.ASCII, true))
+                    buffer = f.ReadBytes(buffer.Length);
+
+                FileStream file = new FileStream(saveFile.FileName, FileMode.OpenOrCreate, FileAccess.Write);
                 file.Write(buffer, 0, buffer.Length);
                 file.Close();
 
