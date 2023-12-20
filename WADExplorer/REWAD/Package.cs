@@ -215,7 +215,7 @@ namespace WADExplorer
             int idx = 0;
             foreach (InsideItem child in item.Children)
             {
-                child.Priority = item.Priority;
+                //child.Priority = item.Priority;
 
                 child.FolderStartIndex = -1;
                 if (child.IsFolder & loopChain)
@@ -487,6 +487,7 @@ namespace WADExplorer
                 InsideItem item = new InsideItem()
                 {
                     Name = Path.GetFileName(entry),
+                    Priority = 1, // important
 
                     Offset = 0,
                     Size = 0,
@@ -511,6 +512,7 @@ namespace WADExplorer
                 InsideItem item = new InsideItem()
                 {
                     Name = Path.GetFileName(entry),
+                    Priority = 1, // important
 
                     Offset = 0,
                     Size = 0,
@@ -537,7 +539,8 @@ namespace WADExplorer
                     Offset = 0,
                     Size = 0,
                     CRC = -1,
-                    Buffer = new byte[0]
+                    Buffer = new byte[0],
+                    IsFolder = true
                 }
 
                 }
@@ -593,10 +596,9 @@ namespace WADExplorer
                     0, // Total Size is also removed
                     f.ReadUInt32(),  // Size
 
-                    // Unknown
-                    f.ReadInt32(),
-                    f.ReadInt32(),
-                    f.ReadInt32()
+                    f.ReadInt32(), // priority
+                    f.ReadInt32(), // folder start item index 
+                    f.ReadInt32()  // folder next item index
                 );
                 // read buffer
                 var old = StreamPackage.Position; // return to value

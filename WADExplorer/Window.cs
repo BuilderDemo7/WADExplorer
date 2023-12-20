@@ -749,7 +749,7 @@ namespace WADExplorer
             SaveFileDialog saveFile = new SaveFileDialog()
             {
                 Filter = "RenderWare Package File|*.wad",
-                Title = "Save RenderWare Package File As " + (saveInNewFormat ? "(Old Format)" : "(New Format)")
+                Title = "Save RenderWare Package File As " + (!saveInNewFormat ? "(Old Format)" : "(New Format)")
             };
 
             if (saveFile.ShowDialog() == DialogResult.OK)
@@ -985,9 +985,12 @@ namespace WADExplorer
                 Children = new List<InsideItem>(),
                 Buffer = new byte[0],
                 Parent = selectedItem,
+                Priority = 1,
 
                 // this folder is empty so add this
-                FolderStartIndex = -1
+                FolderStartIndex = -1,
+
+                IsFolder = true
             };
 
             OpenPackage.Items.Add(folder);
@@ -1475,7 +1478,7 @@ namespace WADExplorer
                 Items = new List<InsideItem>(),
                 BaseOffset = 0
             };
-            OpenPackage.Items.Add(new InsideItem() { Children = new List<InsideItem>(), CRC = -1 } );
+            OpenPackage.Items.Add(new InsideItem() { Children = new List<InsideItem>(), NameOffset = -1, FolderNextItemIndex = -1, CRC = -1, Buffer = new byte[0], IsFolder = true } );
             OpenPackage.FileName = Path.GetFullPath("untitled") + ".wad";
             GenerateList();
             InitTools();
@@ -1504,7 +1507,7 @@ namespace WADExplorer
                 InsideItem newFolder = new InsideItem()
                 {
                     Name = Path.GetFileName(folder.SelectedPath),
-
+                    Priority = 1,
 
                     Children = new List<InsideItem>(),
                     IsFolder = true,
