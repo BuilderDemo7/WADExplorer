@@ -45,8 +45,10 @@
             this.extractToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceWithToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.addFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.dontSortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ShowMoreInfoBTN = new System.Windows.Forms.ToolStripMenuItem();
@@ -115,8 +117,8 @@
             this.ToolStripReplaceButton = new System.Windows.Forms.ToolStripButton();
             this.ToolStripExtractButton = new System.Windows.Forms.ToolStripButton();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
-            this.addFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.FilterLabel = new System.Windows.Forms.Label();
+            this.filterTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitPanel)).BeginInit();
             this.SplitPanel.Panel1.SuspendLayout();
@@ -268,6 +270,11 @@
             this.deleteToolStripMenuItem.ToolTipText = "Deletes current item (no way back)";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteButton_Click);
             // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(224, 6);
+            // 
             // addFileToolStripMenuItem
             // 
             this.addFileToolStripMenuItem.Enabled = false;
@@ -285,6 +292,15 @@
             this.newFolderToolStripMenuItem.Text = "Add New Folder";
             this.newFolderToolStripMenuItem.ToolTipText = "Adds a empty folder";
             this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.NewFolderButton_Click);
+            // 
+            // addFolderToolStripMenuItem
+            // 
+            this.addFolderToolStripMenuItem.Enabled = false;
+            this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
+            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.addFolderToolStripMenuItem.Text = "Add Folder...";
+            this.addFolderToolStripMenuItem.ToolTipText = "Asks the user to add a folder";
+            this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.AddFolderEditMenuBTN_Click);
             // 
             // toolStripSeparator2
             // 
@@ -959,19 +975,25 @@
             this.ProgressBar.Size = new System.Drawing.Size(167, 15);
             this.ProgressBar.TabIndex = 5;
             // 
-            // addFolderToolStripMenuItem
+            // FilterLabel
             // 
-            this.addFolderToolStripMenuItem.Enabled = false;
-            this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-            this.addFolderToolStripMenuItem.Text = "Add Folder...";
-            this.addFolderToolStripMenuItem.ToolTipText = "Asks the user to add a folder";
-            this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.AddFolderEditMenuBTN_Click);
+            this.FilterLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.FilterLabel.AutoSize = true;
+            this.FilterLabel.Location = new System.Drawing.Point(484, 715);
+            this.FilterLabel.Name = "FilterLabel";
+            this.FilterLabel.Size = new System.Drawing.Size(32, 13);
+            this.FilterLabel.TabIndex = 6;
+            this.FilterLabel.Text = "Filter:";
             // 
-            // toolStripSeparator5
+            // filterTextBox
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(224, 6);
+            this.filterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.filterTextBox.Enabled = false;
+            this.filterTextBox.Location = new System.Drawing.Point(522, 712);
+            this.filterTextBox.Name = "filterTextBox";
+            this.filterTextBox.Size = new System.Drawing.Size(100, 20);
+            this.filterTextBox.TabIndex = 7;
+            this.filterTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // Window
             // 
@@ -979,6 +1001,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(1108, 733);
+            this.Controls.Add(this.filterTextBox);
+            this.Controls.Add(this.FilterLabel);
             this.Controls.Add(this.ProgressBar);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.StatusStripbar);
@@ -1098,6 +1122,8 @@
         private System.Windows.Forms.ToolStripMenuItem AddFolderEditMenuBTN;
         private System.Windows.Forms.ToolStripMenuItem addFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.Label FilterLabel;
+        private System.Windows.Forms.TextBox filterTextBox;
     }
 }
 

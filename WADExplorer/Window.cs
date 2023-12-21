@@ -246,6 +246,8 @@ namespace WADExplorer
 
             SaveBTNTS.Enabled = true;
 
+            filterTextBox.Enabled = true;
+
             FileTree.Enabled = true;
             this.Text = this.Tag + " - " + OpenPackage.FileName;
 
@@ -540,10 +542,16 @@ namespace WADExplorer
             }
         }
 
-        public void CreateItemsUnSorted()
+        public void CreateItemsUnSorted(string filter = null)
         {
             foreach (InsideItem item in OpenPackage.Items)
             {
+                if (filter!=null & item.Name!=null)
+                {
+                    if (!item.Name.ToLower().Contains(filter.ToLower()))
+                        continue; // continue if the filter does not match
+                }
+                // otherwise
                 string name = OpenPackage.GetItemName(item.Index);
                 TreeNode node = FileTree.Nodes.Add(GetItemDisplayName(item));
                 node.Tag = item; // source
@@ -931,7 +939,7 @@ namespace WADExplorer
                         buffer = br.ReadBytes(buffer.Length);
                     }
                     int crc = (int)(buffer.Length*32);
-                    InsideItem item = new InsideItem(false, 0, crc, 0, (uint)buffer.Length, (uint)buffer.Length, 0, 0, 0)
+                    InsideItem item = new InsideItem(false, 0, crc, 0, (uint)buffer.Length, (uint)buffer.Length, true, 0, 0)
                     {
                         Name = Path.GetFileName(file.Name),
                         Index = OpenPackage.Items.Count,
@@ -978,14 +986,14 @@ namespace WADExplorer
             Random randomCRCMagic = new Random(0xCC * OpenPackage.Items.Count + Package.Magic);
             Random randomCRC = new Random(randomCRCMagic.Next());
 
-            InsideItem folder = new InsideItem(false, 0, randomCRC.Next(0xCCCCCCC, 0xFFFFFFF), 0, 0, 0, 0, 0, 0)
+            InsideItem folder = new InsideItem(false, 0, randomCRC.Next(0xCCCCCCC, 0xFFFFFFF), 0, 0, 0, true, 0, 0)
             {
                 Name = "New Folder",
                 Index = OpenPackage.Items.Count,
                 Children = new List<InsideItem>(),
                 Buffer = new byte[0],
                 Parent = selectedItem,
-                Priority = 1,
+                PreLoaded = true,
 
                 // this folder is empty so add this
                 FolderStartIndex = -1,
@@ -1507,7 +1515,7 @@ namespace WADExplorer
                 InsideItem newFolder = new InsideItem()
                 {
                     Name = Path.GetFileName(folder.SelectedPath),
-                    Priority = 1,
+                    PreLoaded = true,
 
                     Children = new List<InsideItem>(),
                     IsFolder = true,
@@ -1528,6 +1536,23 @@ namespace WADExplorer
 
                 GenerateList();
             }
+        }
+
+        private void FilterItems(string filter)
+        {
+            if (filter == "" | filter == new string(' ', filter.Length))
+            {
+                GenerateList(); // generate full list as it's empty
+                return;
+            }
+
+            FileTree.Nodes.Clear();
+            CreateItemsUnSorted(filter);
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            FilterItems(filterTextBox.Text);
         }
     }
 }

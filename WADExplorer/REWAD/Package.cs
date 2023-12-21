@@ -261,8 +261,8 @@ namespace WADExplorer
                     f.ReadUInt32(), // Total Size
                     f.ReadUInt32(),  // Size
 
-                    // Unknown
-                    f.ReadInt32(),
+                    // etc.
+                    f.ReadInt32() >= 1 ? true : false, 
                     f.ReadInt32(),
                     f.ReadInt32()
                 );
@@ -429,7 +429,7 @@ namespace WADExplorer
                     f.Write(item.Buffer.Length);
                     f.Write(item.Buffer.Length);
 
-                    f.Write(item.Priority);
+                    f.Write(item.PreLoaded == true ? (int)1 : (int)0);
 
                     f.Write(item.FolderStartIndex);
                     f.Write(item.FolderNextItemIndex);
@@ -487,7 +487,7 @@ namespace WADExplorer
                 InsideItem item = new InsideItem()
                 {
                     Name = Path.GetFileName(entry),
-                    Priority = 1, // important
+                    PreLoaded = true, // important
 
                     Offset = 0,
                     Size = 0,
@@ -512,7 +512,7 @@ namespace WADExplorer
                 InsideItem item = new InsideItem()
                 {
                     Name = Path.GetFileName(entry),
-                    Priority = 1, // important
+                    PreLoaded = true, // important
 
                     Offset = 0,
                     Size = 0,
@@ -596,7 +596,7 @@ namespace WADExplorer
                     0, // Total Size is also removed
                     f.ReadUInt32(),  // Size
 
-                    f.ReadInt32(), // priority
+                    f.ReadInt32() >= 1 ? true : false, // pre-loaded
                     f.ReadInt32(), // folder start item index 
                     f.ReadInt32()  // folder next item index
                 );
@@ -607,7 +607,7 @@ namespace WADExplorer
                 item.Buffer = new byte[item.Size];
                 StreamPackage.Position = off;
 
-                if (off < StreamPackage.Length & (off + item.Size) < StreamPackage.Length)
+                if (off < StreamPackage.Length & (off + item.Size)-1 < StreamPackage.Length)
                 {
                     for (int byteI = 0; byteI < item.Size; byteI++)
                     {
@@ -726,7 +726,7 @@ namespace WADExplorer
                     //f.Write(item.Buffer.Length);
                     f.Write(item.Buffer.Length);
 
-                    f.Write(item.Priority);
+                    f.Write(item.PreLoaded == true ? (int)1 : (int)0);
 
                     f.Write(item.FolderStartIndex);
                     f.Write(item.FolderNextItemIndex);

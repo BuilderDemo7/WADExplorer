@@ -75,7 +75,7 @@ namespace WADExplorer
 
         //[ReadOnly(true)]
         //[Browsable(false)]
-        public int Priority { get; set; }
+        public bool PreLoaded { get; set; }
 
         public int FolderStartIndex { get; set; }
         public int FolderNextItemIndex { get; set; }
@@ -104,7 +104,7 @@ namespace WADExplorer
             uint totalsize,
             uint size,
 
-            int priority,
+            bool preloaded, 
             int folderSI,
             int folderNII,
 
@@ -121,7 +121,7 @@ namespace WADExplorer
             TotalSize = totalsize;
             Size = size;
 
-            Priority = priority;
+            PreLoaded = preloaded;
             FolderStartIndex = folderSI;
             FolderNextItemIndex = folderNII;
 
