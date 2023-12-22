@@ -542,7 +542,7 @@ namespace WADExplorer
             }
         }
 
-        public void CreateItemsUnSorted(string filter = null)
+        public void CreateItemsUnSorted(string filter = null, bool showFullPaths = false)
         {
             foreach (InsideItem item in OpenPackage.Items)
             {
@@ -553,7 +553,7 @@ namespace WADExplorer
                 }
                 // otherwise
                 string name = OpenPackage.GetItemName(item.Index);
-                TreeNode node = FileTree.Nodes.Add(GetItemDisplayName(item));
+                TreeNode node = FileTree.Nodes.Add(showFullPaths == false ? GetItemDisplayName(item) : Package.GetItemFullPath(item) );
                 node.Tag = item; // source
                 SetIconForNode(node);
                 CreateItems(item, false, node.Nodes);
@@ -1547,12 +1547,165 @@ namespace WADExplorer
             }
 
             FileTree.Nodes.Clear();
-            CreateItemsUnSorted(filter);
+            CreateItemsUnSorted(filter,true);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             FilterItems(filterTextBox.Text);
+        }
+
+        public void CreatePatch(string destinationFolder, string configfileName)
+        {
+            string configFilepath = $"{destinationFolder}\\{configfileName}";
+            // overwrite
+            if (File.Exists(configFilepath))
+                File.Delete(configFilepath);
+
+            TextWriter cfg = File.CreateText(configFilepath);
+            // nevermind..
+            //cfg.WriteLine($"# Format: [File Name; String relative to the 'Content' folder in this folder], [CRC; Number], [Folder Start Index; Index of item from 0 to the ID that starts , [Pre-Loaded; Number between 0 and 1, boolean] ");
+
+            string extractFolder = destinationFolder + "\\" + "Content";
+
+            OpenPackage.RecastParentChainsForItem(OpenPackage.Items[0], true);
+
+            // write configuration for each file
+            int id = 0;
+            foreach (InsideItem item in OpenPackage.Items)
+            {
+                // skip root
+                if (id==0)
+                {
+                    id++;
+                    continue;
+                }
+                cfg.WriteLine($"{Package.GetItemFullPath(item)}, 0x{item.CRC:X4}, {item.FolderStartIndex}, {item.FolderNextItemIndex}, {(item.PreLoaded ? "1" : "0")}");
+                id++;
+            }
+            // close config files
+            cfg.Close();
+
+            if (!Directory.Exists(extractFolder))
+                Directory.CreateDirectory(extractFolder);
+
+            ExtractItemChildrenTo(OpenPackage.Items[0], extractFolder, true);
+        }
+
+        public Package FromPatch(string configfileName)
+        {
+            Package pkg = new Package(new List<InsideItem>()
+            {
+                new InsideItem()
+                {
+                    PreLoaded = false,
+                    FolderNextItemIndex = -1,
+                    FolderStartIndex = 1,
+                    CRC = -1,
+                    Children = new List<InsideItem>(),
+                    Buffer = new byte[0],
+                }
+            }
+            );
+
+            string configFileDir = Path.GetDirectoryName(configfileName);
+            string contentFileDir = $"{configFileDir}\\Content";
+            if (!Directory.Exists(contentFileDir))
+            {
+                throw new DirectoryNotFoundException("Content folder not found");
+            }
+            using (StreamReader text = File.OpenText(configfileName))
+            {
+                string entry = text.ReadLine();
+                int itemId = 1;
+                while (entry != null)
+                {
+                    if (!entry.StartsWith("#"))
+                    {
+                        string[] parameters = entry.Split(',');
+                        if (parameters.Length>=5)
+                        {
+                            string filename = $"{contentFileDir}\\{parameters[0]}";
+                            int crc = Convert.ToInt32(parameters[1].Replace(" ", ""),16);
+                            int f1 = Convert.ToInt32(parameters[2].Replace(" ", ""));
+                            int f2 = Convert.ToInt32(parameters[3].Replace(" ", ""));
+                            bool pre = Convert.ToInt32(parameters[4].Replace(" ", "")) == 1 ? true : false;
+                            InsideItem item = new InsideItem(f1 != -1, 0, crc, 0, 0, 0, pre, f1, f2, new byte[0])
+                            { Index = itemId, Name = Path.GetFileName(parameters[0]) };
+                            // first should be DATA folder, right?
+                            if (itemId == 1)
+                            {
+                                pkg.Items[0].Children.Add(item);
+                                pkg.RecastParentChainsForItem(pkg.Items[0], false);
+                             }
+                            if (f1==-1)
+                            {
+                                FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                                using (BinaryReader br = new BinaryReader(file, Encoding.ASCII, false))
+                                {
+                                    item.Buffer = br.ReadBytes((int)file.Length);
+                                }
+                                file.Close();
+                            }
+                            pkg.Items.Add(item);
+                            itemId++;
+                        }
+                    }
+                    entry = text.ReadLine();
+                }
+                text.Close(); // close stream
+            }
+
+            // fix parents and use Children, etc....
+            pkg.ParseParents();
+
+            return pkg;
+        }
+
+        private void createPatchableWADConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (OpenPackage==null | OpenPackage.FileName == null)
+            {
+                MessageBox.Show("No package open!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            FolderBrowserDialog dialog = new FolderBrowserDialog()
+            {
+                Description = "Select a folder to as patch destination folder",
+                SelectedPath = Path.GetFullPath(OpenPackage.FileName).Replace(Path.GetFileName(OpenPackage.FileName), "")
+            };
+
+            DialogResult result = dialog.ShowDialog();
+
+            string configFileName = Path.GetFileNameWithoutExtension(OpenPackage.FileName)+".cfg";
+
+            if (File.Exists(dialog.SelectedPath+"\\"+configFileName))
+            {
+                if (MessageBox.Show("The selected folder already contains configuration file for this WAD,\nContinue and overwrite?", "Continue?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                    return;
+            }
+
+            CreatePatch(dialog.SelectedPath,configFileName);
+            MessageBox.Show($"Successfully patched to {dialog.SelectedPath+configFileName}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void importPatchableWADConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog configFilePatch = new OpenFileDialog()
+            {
+                Title = "Open Patchable WAD Configuration File",
+                Filter = "Config Files|*.cfg|All files|*.*"
+            };
+            if (configFilePatch.ShowDialog()==DialogResult.OK)
+            {
+                Package pkg = FromPatch(configFilePatch.FileName);
+                OpenPackage.DisposeStreams(); // dispose streams / close
+                OpenPackage = pkg;
+                MessageBox.Show("Successfully imported patch!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                InitTools();
+                GenerateList();
+            }
         }
     }
 }

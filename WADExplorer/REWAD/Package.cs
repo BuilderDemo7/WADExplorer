@@ -167,6 +167,7 @@ namespace WADExplorer
             return fullpath;
         }
 
+        // counterpart: RecastParentChainsForItem
         public virtual void ParseParents()
         {
             foreach (InsideItem item in Items)
