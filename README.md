@@ -21,8 +21,10 @@ That's where the materials are stored into.
 Now if you see full paths to the texture like this:                                        
 **C:/My Folder/My Texture.png**                                        
 You should change it to:                              
-**Data/My Folder/My Texture.png** *(Include "Data" as root)*                                              
-Otherwise the game won't **load** it because it wasn't found in the *.WAD* file.
+**Data\My Folder\My Texture.png** *(Include "Data" as root)*                   
+Make sure the seperators of the path is slash facing left (\)                                                                             
+Otherwise the game won't **load** it because it wasn't found in the *.WAD* file,                       
+Also keep in mind the game seems to only load existing textures.               
 ## Vertices
 *Using Blender 2.76...*                                                        
 
@@ -40,6 +42,10 @@ If your model editor have these options then make them unchecked or checked acco
 - (YES) Keep Vertex Order                                     
 
 *...(The rest you don't do anything)* 
+ 
+# Forking
+Fork and make your own features for WADExplorer!                             
+Don't forget to describe what you changed and what you added.               
  
 # License
 *MIT License*                            
